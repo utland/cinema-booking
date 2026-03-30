@@ -1,3 +1,4 @@
+import { UpdateUserApiDto } from 'src/presentation/user/dtos/update-user-api.dto';
 import { TestBuilder } from './config/builder.test';
 import { ITestPayload, tokenName } from './config/dtos.test';
 import { EntityFactory } from './config/entity-factory.test';
@@ -21,16 +22,6 @@ describe('UserModule (e2e)', () => {
     await builder.closeApp();
   });
 
-  describe('POST /user', () => {
-    it('should be available only for ADMIN', async () => {
-      
-    });
-
-    it('should create an user', async () => {
-      
-    });
-  });
-
   describe('GET /user', () => {
     it('should return current user data', async () => {
       const response = await request(server)
@@ -49,7 +40,10 @@ describe('UserModule (e2e)', () => {
 
   describe('PATCH /user', () => {
     it('should update current user data', async () => {
-      const updateUserDto = { firstName: 'UpdatedName' };
+      const updateUserDto: UpdateUserApiDto = {
+        firstName: 'UpdatedName',
+        lastName: 'UpdatedLastName',
+      };
 
       await request(server)
         .patch('/user')
@@ -63,6 +57,7 @@ describe('UserModule (e2e)', () => {
         .expect(200);
 
       expect(res.body.firstName).toBe(updateUserDto.firstName);
+      expect(res.body.lastName).toBe(updateUserDto.lastName);
     });
   });
 

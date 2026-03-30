@@ -1,14 +1,13 @@
-import { SignUpDto } from 'src/auth/dto/sign-up.dto';
+import { CreateUserApiDto } from 'src/presentation/user/dtos/create-user-api.dto';
 import { TestBuilder } from './config/builder.test';
 import request from 'supertest';
 
-const testSignUp: SignUpDto = {
+const testSignUp: CreateUserApiDto = {
   email: 'test@email.com',
   password: '0000',
   login: 'user',
   firstName: 'test',
   lastName: 'test',
-  phoneNumber: '+3800000000',
 }
 
 describe('AuthModule (e2e)', () => {
@@ -30,15 +29,15 @@ describe('AuthModule (e2e)', () => {
   });
 
   it("should sign up a new user", async () => {
-    const res = await request(server).post('/auth/register').send(testSignUp);
+    const res = await request(server).post('/user/sign-up').send(testSignUp);
 
     expect(res.status).toBe(201);
   });
 
   it("should sign in an existing user", async () => {
-    await request(server).post('/auth/register').send(testSignUp);
+    await request(server).post('/user/sign-up').send(testSignUp);
 
-    const res = await request(server).post('/auth/login').send({
+    const res = await request(server).post('/user/sign-in').send({
       login: testSignUp.login,
       password: testSignUp.password,
     });

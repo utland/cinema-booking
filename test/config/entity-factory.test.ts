@@ -1,18 +1,18 @@
 import { INestApplication } from "@nestjs/common";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { SignUpDto } from "src/auth/dto/sign-up.dto";
-import { Role } from "src/common/enums/role.enum";
-import { Hall, HallType } from "src/hall/entities/hall.entity";
-import { Seat } from "src/hall/entities/seat.entity";
-import { Movie } from "src/movie/entities/movie.entity";
-import { User } from "src/user/entities/user.entity";
 import request from 'supertest';
 import { Repository } from "typeorm";
 import { adminTest, hallTest, ITestPayload, movieTest, sessionTest, tokenName, userTest } from "./dtos.test";
-import { CreateMovieDto } from "src/movie/dto/create-movie.dto";
-import { Session } from "src/session/entities/session.entity";
-import { Ticket } from "src/ticket/entities/ticket.entity";
-import { CreateSessionDto } from "src/session/dto/create-session.dto";
+import { TypeOrmUser } from "src/infrastructure/persistence/user/entities/typeorm-user.entity";
+import { Role } from "src/domain/user/models/user.entity";
+import { TypeOrmHall } from "src/infrastructure/persistence/hall/entities/typeorm-hall.entity";
+import { TypeOrmSeat } from "src/infrastructure/persistence/hall/entities/typeorm-seat.entity";
+import { CreateMovieApiDto } from "src/presentation/movie/dtos/create-movie-api.dto";
+import { TypeOrmMovie } from "src/infrastructure/persistence/movie/entities/typeorm-movie.entity";
+import { TypeOrmTicket } from "src/infrastructure/persistence/ticket/entities/typeorm-ticket.entity";
+import { CreateSessionApiDto } from "src/presentation/session/dtos/create-session-api.dto";
+import { TypeOrmSession } from "src/infrastructure/persistence/session/entities/typeorm-session.entity";
+import { randomUUID } from "crypto";
 
 export class EntityFactory {
     server: any;
@@ -26,15 +26,15 @@ export class EntityFactory {
     public async createUsers(): Promise<Map<tokenName, ITestPayload>> {
         const tokens = new Map<tokenName, ITestPayload>();
 
-        await request(this.server).post("/auth/register").send(userTest).expect(201);
-        await request(this.server).post("/auth/register").send(adminTest).expect(201);
+        await request(this.server).post("/user/sign-up").send(userTest).expect(201);
+        await request(this.server).post("/user/sign-up").send(adminTest).expect(201);
 
-        const userRepo = this.app.get<Repository<User>>(getRepositoryToken(User));
+        const userRepo = this.app.get<Repository<TypeOrmUser>>(getRepositoryToken(TypeOrmUser));
 
         await userRepo.update({ login: adminTest.login }, { role: Role.ADMIN });
 
-        const userRes = await request(this.server).post("/auth/login").send(userTest).expect(201);
-        const adminRes = await request(this.server).post("/auth/login").send(adminTest).expect(201);
+        const userRes = await request(this.server).post("/user/sign-in").send(userTest).expect(201);
+        const adminRes = await request(this.server).post("/user/sign-in").send(adminTest).expect(201);
 
         const user = await userRepo.findOneByOrFail({ login: userTest.login });
         const admin = await userRepo.findOneByOrFail({ login: adminTest.login });
@@ -55,10 +55,10 @@ export class EntityFactory {
     }
 
     public async createUser(): Promise<ITestPayload> {
-        await request(this.server).post("/auth/register").send(userTest).expect(201);
-        const userRes = await request(this.server).post("/auth/login").send(userTest).expect(201);
+        await request(this.server).post("/user/sign-up").send(userTest).expect(201);
+        const userRes = await request(this.server).post("/user/sign-in").send(userTest).expect(201);
 
-        const userRepo = this.app.get<Repository<User>>(getRepositoryToken(User));
+        const userRepo = this.app.get<Repository<TypeOrmUser>>(getRepositoryToken(TypeOrmUser));
         const user = await userRepo.findOneByOrFail({ login: userTest.login });
 
         return {
@@ -69,18 +69,18 @@ export class EntityFactory {
     }
 
     public async createHall(): Promise<string> {
-        const hallRepo = this.app.get<Repository<Hall>>(getRepositoryToken(Hall));
-        const { id } = await hallRepo.save(hallTest);
+        const hallRepo = this.app.get<Repository<TypeOrmHall>>(getRepositoryToken(TypeOrmHall));
+        const { id } = await hallRepo.save({ ...hallTest, id: randomUUID() });
 
         return id;
     }
 
     public async createSeats(hallId: string, count: number): Promise<string[]> {
-        const seatRepo = this.app.get<Repository<Seat>>(getRepositoryToken(Seat));
-        const seats: Partial<Seat>[] = [];
+        const seatRepo = this.app.get<Repository<TypeOrmSeat>>(getRepositoryToken(TypeOrmSeat));
+        const seats: Partial<TypeOrmSeat>[] = [];
 
         for (let i = 1; i <= count; i++) {
-            seats.push({ rowNumber: 1, seatNumber: i, hallId });
+            seats.push({ rowNumber: 1, columnNumber: i, hallId, id: randomUUID() });
         }
 
         const seatsOrm = await seatRepo.save(seats);
@@ -88,23 +88,23 @@ export class EntityFactory {
         return seatsOrm.map(seat => seat.id);
     }
 
-    public async createMovie(customMovieTest?: Partial<CreateMovieDto>): Promise<string> {
-        const movieRepo = this.app.get<Repository<Movie>>(getRepositoryToken(Movie));
-        const { id } = await movieRepo.save({ ...movieTest, ...customMovieTest });
+    public async createMovie(customMovieTest?: Partial<CreateMovieApiDto>): Promise<string> {
+        const movieRepo = this.app.get<Repository<TypeOrmMovie>>(getRepositoryToken(TypeOrmMovie));
+        const { id } = await movieRepo.save({ ...movieTest, ...customMovieTest, id: randomUUID() });
 
         return id;
     }
 
-    public async createSession(customSessionTest?: Partial<CreateSessionDto>): Promise<any> {
-        const sessionRepo = this.app.get<Repository<Session>>(getRepositoryToken(Session));
+    public async createSession(customSessionTest?: Partial<CreateSessionApiDto>): Promise<any> {
+        const sessionRepo = this.app.get<Repository<TypeOrmSession>>(getRepositoryToken(TypeOrmSession));
 
-        const { id } = await sessionRepo.save({ ...sessionTest, ...customSessionTest });
+        const { id } = await sessionRepo.save({ ...sessionTest, ...customSessionTest, id: randomUUID() });
         return id;
     }
 
     public async createTicket(sessionId: string, seatId: string, userId: string): Promise<string> {
-        const ticketRepo = this.app.get<Repository<Ticket>>(getRepositoryToken(Ticket));
-        const { id } = await ticketRepo.save({ sessionId, seatId, userId, price: 100 });
+        const ticketRepo = this.app.get<Repository<TypeOrmTicket>>(getRepositoryToken(TypeOrmTicket));
+        const { id } = await ticketRepo.save({ sessionId, seatId, userId, price: 100, id: randomUUID(), createdAt: new Date() });
 
         return id;
     }

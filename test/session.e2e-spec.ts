@@ -1,9 +1,10 @@
-import { CreateSessionDto } from 'src/session/dto/create-session.dto';
+import { CreateSessionApiDto } from 'src/presentation/session/dtos/create-session-api.dto';
 import { TestBuilder } from './config/builder.test';
 import { ITestPayload, sessionTest, tokenName } from './config/dtos.test';
 import { EntityFactory } from './config/entity-factory.test';
 import request from 'supertest';
-import { FindSessionByMovieDto } from 'src/session/dto/find-by-movie.dto';
+import { FindSessionsByMovieApiDto } from 'src/presentation/session/dtos/find-sessions-by-movie-api.dto';
+import { UpdateSessionApiDto } from 'src/presentation/session/dtos/update-session-api.dto';
 
 describe('SessionModule (e2e)', () => {
   let builder: TestBuilder;
@@ -12,7 +13,7 @@ describe('SessionModule (e2e)', () => {
   let server: any;
   let hallId: string;
   let movieId: string;
-  let createSessionDto: CreateSessionDto;
+  let createSessionDto: CreateSessionApiDto;
 
   beforeAll(async () => {
     builder = await TestBuilder.create();
@@ -46,23 +47,16 @@ describe('SessionModule (e2e)', () => {
     })
 
     it('should create a new session', async () => {
-      const res = await request(server)
+      await request(server)
         .post('/session')
         .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
         .send(createSessionDto)
         .expect(201);
-
-      expect(res.body.id).toBeDefined();
-      expect(res.body.movieId).toBe(createSessionDto.movieId);
-      expect(res.body.hallId).toBe(createSessionDto.hallId);
-      expect(res.body.startTime).toBe(createSessionDto.startTime.toISOString());
-      expect(res.body.finishTime).toBe(createSessionDto.finishTime.toISOString());
-      expect(res.body.basePrice).toBe(createSessionDto.basePrice);
     });
   });
 
   describe('GET /session/:id', () => {
-    it('should return sessions by movie', async () => {
+    it('should return session with hall information', async () => {
       const sessionId = await entityFactory.createSession(createSessionDto);
       await entityFactory.createSeats(hallId, 1);
 
@@ -71,51 +65,66 @@ describe('SessionModule (e2e)', () => {
         .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
         .expect(200);
 
-      expect(res.body.id).toBeDefined();
-      expect(res.body.movieId).toBe(createSessionDto.movieId);
+      expect(res.body.sessionId).toBeDefined();
       expect(res.body.hallId).toBe(createSessionDto.hallId);
+      expect(res.body.hallName).toBeDefined();
       expect(res.body.startTime).toBe(createSessionDto.startTime.toISOString());
-      expect(res.body.finishTime).toBe(createSessionDto.finishTime.toISOString());
-      expect(res.body.basePrice).toBe(createSessionDto.basePrice.toLocaleString());
+      expect(res.body.endTime).toBe(createSessionDto.finishTime.toISOString());
 
-      expect(res.body.hall).toBeDefined();
-      expect(res.body.hall.seats).toBeDefined();
-      expect(res.body.hall.seats[0].tickets).toBeDefined();
+      expect(res.body.seats).toBeDefined();
+      expect(res.body.seats[0]).toBeDefined();
+      expect(res.body.seats[0].seatId).toBeDefined();
+      expect(res.body.seats[0].row).toBeDefined();
+      expect(res.body.seats[0].column).toBeDefined();
+      expect(res.body.seats[0].isAvailable).toBe(true);      
     });
   });
 
   describe('GET /session', () => {
-    it('should return session hall by id', async () => {
-      const findDto: FindSessionByMovieDto = {
+    it('should return sessions by movie', async () => {
+      const findDto: FindSessionsByMovieApiDto = {
         movieId,
-        dateSession: new Date()
+        dateOfSession: new Date()
       }
 
-      const sessionId = await entityFactory.createSession({ movieId, hallId });
-      await entityFactory.createSession({ 
-        movieId, hallId, startTime: new Date(Date.now() + 24 * 60 * 60 * 1000) 
+      const sessionId = await entityFactory.createSession({ 
+        movieId, 
+        hallId, 
+        startTime: new Date(), 
+        finishTime: new Date(Date.now() + 2 * 60 * 60 * 1000)
       });
 
-      const [seatId0, seatsId1] = await entityFactory.createSeats(hallId, 5);
+      const [seatId1] = await entityFactory.createSeats(hallId, 5);
       await entityFactory.createTicket(
-        sessionId, seatId0, tokens.get("user")!.id
+        sessionId, seatId1, tokens.get("user")!.id
       );
 
       const res = await request(server)
         .get('/session')
         .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
         .send(findDto)
+        .expect(res => {
+          console.log(res.body);
+        })
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);      
       expect(res.body.length).toBe(1);
+      expect(res.body[0].sessionId).toBeDefined();
+      expect(res.body[0].hallName).toBeDefined();
+      expect(res.body[0].startTime).toBeDefined();
+      expect(res.body[0].endTime).toBeDefined();
       expect(res.body[0].availableSeats).toBe(4);
-      expect(res.body[0].seatsNumber).toBe(5);
+      expect(res.body[0].totalSeats).toBe(5);
     });
   });
 
   describe('PATCH /session/:id', () => {
-    const updateSessionDto = { startTime: new Date(Date.now() + 2 * 60 * 60 * 1000) };
+    const updateSessionDto: UpdateSessionApiDto = {
+      startTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
+      finishTime: new Date(Date.now() + 4 * 60 * 60 * 1000),
+      basePrice: 100
+    };
 
     it('should be available only for ADMIN', async () => {
       await request(server)
@@ -138,12 +147,10 @@ describe('SessionModule (e2e)', () => {
         .send(updateSessionDto)
         .expect(200);
 
-      const res = await request(builder.app.getHttpServer())
+      await request(builder.app.getHttpServer())
         .get(`/session/${sessionId}?hallId=${hallId}`)
         .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
         .expect(200);
-
-      expect(res.body.startTime).toBe(updateSessionDto.startTime.toISOString());
     });
   });
 

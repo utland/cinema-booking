@@ -3,9 +3,10 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { ValidationPipe } from "@nestjs/common/pipes";
 import { DataSource } from "typeorm";
 import { ClassSerializerInterceptor, INestApplication } from "@nestjs/common";
-import { AppModule } from "../../src/app.module";
 import { Reflector } from "@nestjs/core";
 import { testConfig } from "./config.test";
+import { AppModule } from "src/core/app.module";
+import { DomainExceptionFilter } from "src/application/common/filters/domain-exception.filter";
 
 export class TestBuilder {
     private _app: INestApplication;
@@ -44,7 +45,9 @@ export class TestBuilder {
             })
         );
 
+        this.app.useGlobalFilters(new DomainExceptionFilter());
         this.app.useGlobalInterceptors(new ClassSerializerInterceptor(new Reflector()));
+        
 
         await this._app.init();
     }

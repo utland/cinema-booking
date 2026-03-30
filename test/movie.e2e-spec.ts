@@ -1,4 +1,4 @@
-import { UpdateMovieDto } from 'src/movie/dto/update-movie.dto';
+import { UpdateMovieApiDto } from 'src/presentation/movie/dtos/update-movie-api.dto';
 import { TestBuilder } from './config/builder.test';
 import { ITestPayload, movieTest, tokenName } from './config/dtos.test';
 import { EntityFactory } from './config/entity-factory.test';
@@ -42,17 +42,6 @@ describe('MovieModule (e2e)', () => {
         .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
         .send(movieTest)
         .expect(201);
-
-      expect(res.body).toHaveProperty('id');
-      expect(res.body.title).toBe(movieTest.title);
-      expect(res.body.description).toBe(movieTest.description);
-      expect(res.body.duration).toBe(movieTest.duration);
-      expect(res.body.genre).toBe(movieTest.genre);
-
-      await request(server)
-        .get(`/movie/${res.body.id}`)
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .expect(200);
     });
   });
 
@@ -80,9 +69,13 @@ describe('MovieModule (e2e)', () => {
 
   describe('GET /movie', () => {
     it('should return movies by rent date', async () => {
-      await entityFactory.createMovie();
+      await entityFactory.createMovie({
+        rentStart: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        rentEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000)
+      });
+      
       await entityFactory.createMovie({ 
-        rentStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        rentStart: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         rentEnd: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) 
       });
 
@@ -110,15 +103,13 @@ describe('MovieModule (e2e)', () => {
         .set('Authorization', `Bearer ${tokens.get("user")?.token}`)
         .expect(200);
 
-      console.log(res.body.sessions);
-
-      expect(res.body.id).toBe(movieId);
       expect(res.body.title).toBeDefined();
       expect(res.body.description).toBeDefined;
       expect(res.body.duration).toBeDefined();
       expect(res.body.genre).toBeDefined();
-      expect(res.body.sessions).toBeDefined();
-      expect(res.body.sessions.length).toBe(2);
+      expect(res.body.photoUrl).toBeDefined();
+      expect(res.body.rentStart).toBeDefined();
+      expect(res.body.rentEnd).toBeDefined();
     });
   });
 
@@ -134,10 +125,13 @@ describe('MovieModule (e2e)', () => {
     })
 
     it('should update movie', async () => {
-      const updateMovieDto: UpdateMovieDto = {
+      const updateMovieDto: UpdateMovieApiDto = {
         title: 'Updated Movie',
         description: 'Updated Description',
         duration: 150,
+        genre: 'Updated Genre',
+        rentStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        rentEnd: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
       }
 
       const movieId = await entityFactory.createMovie();

@@ -1,7 +1,6 @@
-import { SignUpDto } from "src/auth/dto/sign-up.dto";
-import { HallType } from "src/hall/entities/hall.entity";
-import { CreateMovieDto } from "src/movie/dto/create-movie.dto";
-import { CreateSessionDto } from "src/session/dto/create-session.dto";
+import { HallType } from "src/domain/hall/models/hall.entity";
+import { CreateUserApiDto } from "src/presentation/user/dtos/create-user-api.dto";
+
 
 export type tokenName = "user" | "admin";
 
@@ -11,22 +10,20 @@ export interface ITestPayload {
     login: string;
 }
 
-export const userTest: SignUpDto = {
+export const userTest: CreateUserApiDto = {
     email: 'test0@email.com',
     password: '0000',
     login: 'user',
     firstName: 'test',
     lastName: 'test',
-    phoneNumber: '+3800000000',
 };
 
-export const adminTest: SignUpDto = {
+export const adminTest: CreateUserApiDto = {
     email: 'test2@email.com',
     password: '0000',
     login: 'admin',
     firstName: 'test',
     lastName: 'test',
-    phoneNumber: '+3800000000',
 };
 
 export const hallTest = { 
@@ -34,7 +31,7 @@ export const hallTest = {
     type: HallType.STANDART 
 }
 
-export const movieTest: CreateMovieDto = { 
+export const movieTest = { 
     title: 'Test Movie', 
     description: 'Test Description', 
     duration: 120, 
@@ -43,9 +40,9 @@ export const movieTest: CreateMovieDto = {
     rentEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 };
 
-export const sessionTest: CreateSessionDto = {
-    startTime: new Date(),
-    finishTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
+export const sessionTest = {
+    startTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
+    finishTime: new Date(Date.now() + 4 * 60 * 60 * 1000),
     basePrice: 200,
     movieId: "",
     hallId: ""

@@ -1,5 +1,5 @@
-import { ConfigType } from "src/config/config.types";
 import * as dotenv from "dotenv";
+import { ConfigType } from "src/core/config/config.types";
 
 dotenv.config();
 
