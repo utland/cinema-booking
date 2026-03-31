@@ -9,6 +9,7 @@ export class BcryptService implements PasswordService {
     public async hash(password: string): Promise<string> {
         return bcrypt.hash(password, this.salt)
     }
+    
     public async compare(password: string, hashed: string): Promise<boolean> {
         return await bcrypt.compare(password, hashed);
     }

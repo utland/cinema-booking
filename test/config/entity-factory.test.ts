@@ -95,7 +95,7 @@ export class EntityFactory {
         return id;
     }
 
-    public async createSession(customSessionTest?: Partial<CreateSessionApiDto>): Promise<any> {
+    public async createSession(customSessionTest?: Partial<CreateSessionApiDto>): Promise<string> {
         const sessionRepo = this.app.get<Repository<TypeOrmSession>>(getRepositoryToken(TypeOrmSession));
 
         const { id } = await sessionRepo.save({ ...sessionTest, ...customSessionTest, id: randomUUID() });

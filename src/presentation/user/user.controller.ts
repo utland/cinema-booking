@@ -6,8 +6,8 @@ import {
   Param,
   Delete,
   Post,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { UserService } from 'src/application/user/user.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { Payload } from 'src/application/common/models/payload.i';
 import { UpdateUserApiDto } from './dtos/update-user-api.dto';
@@ -16,26 +16,41 @@ import { Role } from 'src/domain/user/models/user.entity';
 import { CreateUserApiDto } from './dtos/create-user-api.dto';
 import { ValidateUserApiDto } from './dtos/sign-in-api.dto';
 import { Public } from '../common/decorators/public.decorator';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from 'src/application/user/commands/create-user/create-user.command';
+import { FindUserByIdQuery } from 'src/application/user/queries/find-user-by-id/find-user-by-id.query';
+import { UpdateUserCommand } from 'src/application/user/commands/update-user/update-user.command';
+import { DeleteUserCommand } from 'src/application/user/commands/delete-user/delete-user.command';
+import { ValidateUserQuery } from 'src/application/user/queries/validate-user/validate-user.query';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Public()
   @Post("/sign-up")
   public async signUp(@Body() createUserDto: CreateUserApiDto) {
-    return await this.userService.create(createUserDto);
+    const { email, password, login, firstName, lastName } = createUserDto;
+    return await this.commandBus.execute(
+      new CreateUserCommand(email, password, login, firstName, lastName)
+    );
   }
 
   @Public()
   @Post("/sign-in")
   public async signIn(@Body() validateUserDto: ValidateUserApiDto) {
-    return await this.userService.validate(validateUserDto);
+    const { login, password } = validateUserDto;
+    return await this.queryBus.execute(
+      new ValidateUserQuery(login, password)
+    );
   }
 
   @Get()
   public async findById(@CurrentUser() user: Payload) {
-    return await this.userService.findById(user.id);
+    return await this.queryBus.execute(new FindUserByIdQuery(user.id));
   }
 
   @Patch()
@@ -43,12 +58,16 @@ export class UserController {
     @CurrentUser() user: Payload,
     @Body() updateUserDto: UpdateUserApiDto,
   ) {
-    return await this.userService.update({ ...updateUserDto, userId: user.id });
+    const { firstName, lastName } = updateUserDto;
+    
+    return await this.commandBus.execute(
+      new UpdateUserCommand(user.id, firstName, lastName)
+    );
   }
 
   @Roles(Role.ADMIN)
   @Delete('/:id')
-  public async remove(@Param('id') userId: string) {
-    return await this.userService.remove(userId);
+  public async remove(@Param('id', new ParseUUIDPipe()) userId: string) {
+    return await this.commandBus.execute(new DeleteUserCommand(userId));
   }
 }

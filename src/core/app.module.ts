@@ -12,6 +12,7 @@ import { MovieModule } from './modules/movie.module';
 import { SessionModule } from './modules/session.module';
 import { TicketModule } from './modules/ticket.module';
 import { UserModule } from './modules/user.module';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -20,6 +21,8 @@ import { UserModule } from './modules/user.module';
       validationSchema: appSchema,
       load: [databaseConfig, jwtConfig],
     }),
+
+    CqrsModule.forRoot(),
 
     InfrastructureModule,
     HallModule,

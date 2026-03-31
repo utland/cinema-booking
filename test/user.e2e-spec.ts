@@ -22,19 +22,59 @@ describe('UserModule (e2e)', () => {
     await builder.closeApp();
   });
 
+  afterEach(async () => {
+    await builder.clearDb(["users"]);
+  })
+
   describe('GET /user', () => {
     it('should return current user data', async () => {
-      const response = await request(server)
+      
+      const movieId = await entityFactory.createMovie();
+      
+      const hallId = await entityFactory.createHall();
+      
+      const [seatId1, seatId2] = await entityFactory.createSeats(hallId, 2);
+      
+      const sessionsId1 = await entityFactory.createSession({ hallId, movieId });
+      const sessionId2 = await entityFactory.createSession({ 
+        hallId, 
+        movieId, 
+        startTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
+        finishTime: new Date(Date.now() - 1 * 60 * 60 * 1000)
+      });
+      
+      const ticketId1 = await entityFactory.createTicket(
+        sessionsId1, 
+        seatId1, 
+        tokens.get('user')!.id
+      );
+      const ticketId2 = await entityFactory.createTicket(
+        sessionId2, 
+        seatId2, 
+        tokens.get('user')!.id
+      );
+
+      const res = await request(server)
         .get('/user')
         .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
         .expect(200);
 
-      expect(response.body.id).toBe(tokens.get('user')?.id);
-      expect(response.body.login).toBe(tokens.get('user')?.login);
-      expect(response.body.email).toBeDefined();
-      expect(response.body.firstName).toBeDefined();
-      expect(response.body.lastName).toBeDefined();
-      expect(response.body.password).toBeUndefined();
+      console.log(res.body)
+
+      expect(res.body.id).toBe(tokens.get('user')?.id);
+      expect(res.body.login).toBe(tokens.get('user')?.login);
+      expect(res.body.email).toBeDefined();
+      expect(res.body.firstName).toBeDefined();
+      expect(res.body.lastName).toBeDefined();
+      expect(res.body.password).toBeUndefined();
+
+      expect(Array.isArray(res.body.tickets)).toBe(true);
+      expect(res.body.tickets.length).toBe(1);
+      expect(res.body.tickets[0].ticketId).toBe(ticketId1);
+      expect(res.body.tickets[0].movieTitle).toBeDefined();
+      expect(res.body.tickets[0].showTime).toBeDefined();
+      expect(res.body.tickets[0].row).toBeDefined();
+      expect(res.body.tickets[0].column).toBeDefined();
     });
   });
 
@@ -79,7 +119,6 @@ describe('UserModule (e2e)', () => {
         .get('/user')
         .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
         .expect(404);
-
     });
   });
 });

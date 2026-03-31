@@ -31,26 +31,6 @@ export class TypeOrmSessionRepository implements SessionRepository {
         return sessionsDomain;
     }
 
-    public async findByRentDate(movieId: string, sessionDate: Date): Promise<Session[]> {
-        const from = startOfDay(sessionDate);
-        const to = endOfDay(sessionDate);
-
-        const sessionsOrm = await this.sessionRepo.find({ where: {
-            movieId,
-            startTime: Between(from, to)
-        }});
-
-        const sessionsDomain = sessionsOrm.map(item => this.sessionMapper.toDomain(item));
-        return sessionsDomain;
-    }
-
-    public async findAll(): Promise<Session[]> {
-        const sessionsOrm = await this.sessionRepo.find();
-
-        const sessionsDomain = sessionsOrm.map(item => this.sessionMapper.toDomain(item));
-        return sessionsDomain;
-    }
-
     public async save(session: Session): Promise<void> {
         const sessionOrm = this.sessionMapper.toOrm(session);
 

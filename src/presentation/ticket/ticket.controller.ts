@@ -5,23 +5,32 @@ import {
   Param,
   Patch,
   Post,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { type Payload } from 'src/application/common/models/payload.i';
 import { CreateTicketApiDto } from './dtos/create-ticket.dto';
-import { TicketService } from 'src/application/ticket/ticket.service';
 import { UpdateTicketStatusApiDto } from './dtos/update-ticket-status.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateTicketCommand } from 'src/application/ticket/commands/create-ticket/create-ticket.command';
+import { UpdateTicketStatusCommand } from 'src/application/ticket/commands/update-ticket-status/update-ticket-status.command';
+import { DeleteTicketCommand } from 'src/application/ticket/commands/delete-ticket/delete-ticket.command';
 
 @Controller('ticket')
 export class TicketController {
-  constructor(private readonly ticketService: TicketService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @Post()
   public async create(
     @Body() createTicketDto: CreateTicketApiDto,
     @CurrentUser() user: Payload
   ) {
-    return await this.ticketService.create({ ...createTicketDto, userId: user.id });
+    const { sessionId, seatId, hallId } = createTicketDto;
+    return await this.commandBus.execute(
+      new CreateTicketCommand(sessionId, seatId, user.id, hallId)
+    );
   }
 
   @Patch()
@@ -29,14 +38,17 @@ export class TicketController {
     @Body() updateStatusDto: UpdateTicketStatusApiDto,
     @CurrentUser() user: Payload
   ) {
-    return this.ticketService.updateStatus({ ...updateStatusDto, userId: user.id });
+    const { ticketId, status } = updateStatusDto;
+    return this.commandBus.execute(
+      new UpdateTicketStatusCommand(ticketId, status, user.id)
+    );
   }
 
   @Delete('/:id')
   public async remove(
-    @Param('id') ticketId: string,
+    @Param('id', new ParseUUIDPipe()) ticketId: string,
     @CurrentUser() user: Payload
   ) {
-    return this.ticketService.remove({ userId: user.id, ticketId });
+    return this.commandBus.execute(new DeleteTicketCommand(ticketId, user.id));
   }
 }

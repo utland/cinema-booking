@@ -1,4 +1,4 @@
-import { MoreThan, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TypeOrmMovie } from "../entities/typeorm-movie.entity";
 import { MovieRepository } from "src/domain/movie/ports/movie.repository";
@@ -23,23 +23,6 @@ export class TypeOrmMovieRepository implements MovieRepository {
         return movieDomain;
     }
 
-    public async findAll(): Promise<Movie[]> {
-        const moviesOrm = await this.movieRepo.find();
-
-        const hallDomain = moviesOrm.map(item => this.movieMapper.toDomain(item));
-        return hallDomain;
-    }
-
-    public async findActive(): Promise<Movie[]> {
-        const today = new Date();
-        const moviesOrm = await this.movieRepo.find({ 
-            where: { rentStart: MoreThan(today) }
-        });
-
-        const hallDomain = moviesOrm.map(item => this.movieMapper.toDomain(item));
-        return hallDomain;
-    }
-
     public async save(movie: Movie): Promise<void> {
         const movieOrm = this.movieMapper.toOrm(movie);
 
@@ -51,6 +34,4 @@ export class TypeOrmMovieRepository implements MovieRepository {
 
         await this.movieRepo.remove(movieOrm);
     }
-
-    
 }
