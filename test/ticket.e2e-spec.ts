@@ -57,19 +57,24 @@ describe('TicketModule (e2e)', () => {
     });
   });
 
-  describe('PATCH /ticket', () => {
-    it('should update ticket status', async () => {
+  describe('PATCH /ticket/pay/:id', () => {
+    it('should pay ticket', async () => {
       const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
 
-      const updateTicketDto: UpdateTicketStatusApiDto = {
-        status: TicketStatus.PAID,
-        ticketId,
-      };
+      await request(server)
+        .patch(`/ticket/pay/${ticketId}`)
+        .set('Authorization', `Bearer ${user.token}`)
+        .expect(200);
+    });
+  });
+
+  describe('PATCH /ticket', () => {
+    it('should cancel ticket', async () => {
+      const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
 
       await request(server)
-        .patch('/ticket')
+        .patch(`/ticket/cancel/${ticketId}`)
         .set('Authorization', `Bearer ${user.token}`)
-        .send(updateTicketDto)
         .expect(200);
     });
   });

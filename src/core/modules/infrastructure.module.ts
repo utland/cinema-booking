@@ -10,10 +10,14 @@ import { TypeOrmHall } from "src/infrastructure/persistence/hall/entities/typeor
 import { TypeOrmSeat } from "src/infrastructure/persistence/hall/entities/typeorm-seat.entity";
 import { JwtModule } from "@nestjs/jwt";
 import { IJwtConfig } from "../config/jwt.config";
-import { CREDENTIAL_SERVICE_TOKEN } from "src/application/common/ports/credential.service";
+import { CREDENTIAL_SERVICE_TOKEN } from "src/application/extrenal-services/ports/credential.service";
 import { TokenService } from "src/infrastructure/external-services/adapters/token.service";
-import { PASSWORD_SERVICE_TOKEN } from "src/application/common/ports/password.service";
+import { PASSWORD_SERVICE_TOKEN } from "src/application/extrenal-services/ports/password.service";
 import { BcryptService } from "src/infrastructure/external-services/adapters/bcrypt.service";
+import { NOTIFICATION_SERVICE_TOKEN } from "src/application/extrenal-services/ports/notification.service";
+import { NodemailerService } from "src/infrastructure/external-services/adapters/nodemailer.service";
+import { PAYMENT_SERVICE_TOKEN } from "src/application/extrenal-services/ports/payment.service";
+import { StripeService } from "src/infrastructure/external-services/adapters/stripe.service";
 
 @Global()
 @Module({
@@ -57,8 +61,21 @@ import { BcryptService } from "src/infrastructure/external-services/adapters/bcr
         {
             provide: PASSWORD_SERVICE_TOKEN,
             useClass: BcryptService
-        }
+        },
+        {
+          provide: NOTIFICATION_SERVICE_TOKEN,
+          useClass: NodemailerService
+        },
+        {
+          provide: PAYMENT_SERVICE_TOKEN,
+          useClass: StripeService
+        },
     ],
-    exports: [CREDENTIAL_SERVICE_TOKEN, PASSWORD_SERVICE_TOKEN]
+    exports: [
+      CREDENTIAL_SERVICE_TOKEN, 
+      PASSWORD_SERVICE_TOKEN,
+      NOTIFICATION_SERVICE_TOKEN,
+      PAYMENT_SERVICE_TOKEN
+    ]
 })
 export class InfrastructureModule {}

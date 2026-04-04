@@ -8,7 +8,7 @@ import {
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { CREDENTIAL_SERVICE_TOKEN, type CredentialService } from 'src/application/common/ports/credential.service';
+import { CREDENTIAL_SERVICE_TOKEN, type CredentialService } from 'src/application/extrenal-services/ports/credential.service';
 import { Payload } from 'src/application/common/models/payload.i';
 
 @Injectable()

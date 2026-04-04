@@ -33,10 +33,6 @@ export class Ticket extends AggregateRoot {
         if (status === TicketStatus.PAID && this._status !== TicketStatus.RESERVED) {
           throw new DomainException(409, 'Ticket cannot be paid');
         }
-    
-        if (status === TicketStatus.CANCELLED && this._status !== TicketStatus.PAID) {
-          throw new DomainException(409, 'Ticket can be cancelled only if it is paid');
-        }
 
         this._status = status;
     }

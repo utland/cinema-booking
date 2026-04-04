@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreateUserCommand } from "./create-user.command";
 import { USER_REPOSITORY_TOKEN, type UserRepository } from "src/domain/user/ports/user.repository";
 import { Role, User } from "src/domain/user/models/user.entity";
-import { PASSWORD_SERVICE_TOKEN, type PasswordService } from "src/application/common/ports/password.service";
+import { PASSWORD_SERVICE_TOKEN, type PasswordService } from "src/application/extrenal-services/ports/password.service";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {

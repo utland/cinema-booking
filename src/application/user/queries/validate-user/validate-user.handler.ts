@@ -3,8 +3,8 @@ import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { ValidateUserQuery } from "./validate-user.query";
 import { USER_REPOSITORY_TOKEN, type UserRepository } from "src/domain/user/ports/user.repository";
 import { ValidateResponseDto } from "../dtos/validate-response.dto";
-import { PASSWORD_SERVICE_TOKEN, type PasswordService } from "src/application/common/ports/password.service";
-import { CREDENTIAL_SERVICE_TOKEN, type CredentialService } from "src/application/common/ports/credential.service";
+import { PASSWORD_SERVICE_TOKEN, type PasswordService } from "src/application/extrenal-services/ports/password.service";
+import { CREDENTIAL_SERVICE_TOKEN, type CredentialService } from "src/application/extrenal-services/ports/credential.service";
 import { Payload } from "src/application/common/models/payload.i";
 
 @QueryHandler(ValidateUserQuery)

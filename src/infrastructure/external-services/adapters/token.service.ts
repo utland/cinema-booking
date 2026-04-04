@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { CredentialService } from "src/application/common/ports/credential.service";
+import { CredentialService } from "src/application/extrenal-services/ports/credential.service";
 
 @Injectable()
 export class TokenService implements CredentialService {

@@ -10,12 +10,14 @@ import { TICKET_REPOSITORY_TOKEN } from 'src/domain/ticket/ports/ticket.reposito
 import { TypeOrmTicketMapper } from 'src/infrastructure/persistence/ticket/mappers/typeorm-ticket.mapper';
 import { CreateTicketHandler } from 'src/application/ticket/commands/create-ticket/create-ticket.handler';
 import { DeleteTicketHandler } from 'src/application/ticket/commands/delete-ticket/delete-ticket.handler';
-import { UpdateTicketStatusHandler } from 'src/application/ticket/commands/update-ticket-status/update-ticket-status.handler';
+import { CancelTicketHandler } from 'src/application/ticket/commands/cancel-ticket/cancel-ticket.handler';
+import { PayTicketHandler } from 'src/application/ticket/commands/pay-ticket/pay-ticket.handler';
 
 const commands = [
   CreateTicketHandler,
   DeleteTicketHandler,
-  UpdateTicketStatusHandler
+  CancelTicketHandler,
+  PayTicketHandler
 ];
 
 @Module({

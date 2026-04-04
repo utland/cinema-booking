@@ -1,4 +1,4 @@
-import { PasswordService } from "src/application/common/ports/password.service";
+import { PasswordService } from "src/application/extrenal-services/ports/password.service";
 import bcrypt from 'bcrypt';
 import { Injectable } from "@nestjs/common";
 
