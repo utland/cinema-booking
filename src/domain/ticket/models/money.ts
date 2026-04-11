@@ -1,6 +1,6 @@
 import { differenceInMinutes } from "date-fns";
 import { ValueObject } from "src/domain/common/domain-objects/value-object";
-import { DomainException } from "src/domain/common/exceptions/base-exception";
+import { BadRequestDomainException } from "src/domain/common/exceptions/bad-request.exception";
 
 export class Money implements ValueObject {
     constructor(
@@ -22,7 +22,7 @@ export class Money implements ValueObject {
 
     public validatePrice(price: number): void {
         if (price <= 0) {
-            throw new DomainException(400, "Price cannot be less than 0")
+            throw new BadRequestDomainException("Price cannot be less than 0")
         }
     }
 

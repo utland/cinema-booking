@@ -35,6 +35,7 @@ const queries = [
     TypeOrmMovieMapper,
     { provide: MOVIE_REPOSITORY_TOKEN, useClass: TypeOrmMovieRepository },
     { provide: MOVIE_READ_REPOSITORY_TOKEN, useClass: TypeOrmMovieReadRepository }
-  ]
+  ],
+  exports: [MOVIE_REPOSITORY_TOKEN]
 })
 export class MovieModule {}
