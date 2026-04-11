@@ -1,4 +1,4 @@
-import { DomainException } from "src/domain/common/exceptions/base-exception";
+import { BadRequestDomainException } from "src/domain/common/exceptions/bad-request.exception";
 import { Movie } from "./movie.entity";
 
 describe("Movie Test", () => {
@@ -12,10 +12,9 @@ describe("Movie Test", () => {
                 new Date("2023-01-02"),
                 new Date("2023-01-01")
             );
-        } catch (err) {
-            expect(err).toBeInstanceOf(DomainException);
+        } catch (err: any) {
+            expect(err).toBeInstanceOf(BadRequestDomainException);
             expect(err.message).toBe("End time must be greater than start time for movie");
-            expect(err.status).toBe(400);
         }
     });
 
@@ -31,10 +30,9 @@ describe("Movie Test", () => {
             );
 
             movie.updateInfo("New Title", "New Description", 130, "Action");
-        } catch (err) {
-            expect(err).toBeInstanceOf(DomainException);
+        } catch (err: any) {
+            expect(err).toBeInstanceOf(BadRequestDomainException);
             expect(err.message).toBe("Movie cannot be changed during streaming");
-            expect(err.status).toBe(400);
         }
     });
 
@@ -50,10 +48,9 @@ describe("Movie Test", () => {
             );
 
             movie.validateDeleteOperation();
-        } catch (err) {
-            expect(err).toBeInstanceOf(DomainException);
+        } catch (err: any) {
+            expect(err).toBeInstanceOf(BadRequestDomainException);
             expect(err.message).toBe("Movie cannot be deleted during streaming");
-            expect(err.status).toBe(400);
         }
     });
 });

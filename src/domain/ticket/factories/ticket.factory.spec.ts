@@ -7,7 +7,8 @@ import { Session } from "../../session/models/session.entity";
 import { Hall, HallType } from "../../hall/models/hall.entity";
 import { Seat } from "../../hall/models/seat.entity";
 import { Ticket, TicketStatus } from "../models/ticket.entity";
-import { DomainException } from "../../common/exceptions/base-exception";
+import { NotFoundDomainException } from "src/domain/common/exceptions/not-found.exception";
+import { ConflictDomainException } from "src/domain/common/exceptions/conflict.exception";
 
 const mockTicketRepository = {
     findBySeat: jest.fn(),
@@ -159,7 +160,7 @@ describe("TicketFactory", () => {
                 });
             } 
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(NotFoundDomainException);
             await expect(res).rejects.toThrow("Session doesn't exist");
         });
 
@@ -184,7 +185,7 @@ describe("TicketFactory", () => {
                 });
             } 
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(ConflictDomainException);
             await expect(res).rejects.toThrow("Booking time has passed");
         });
 
@@ -201,7 +202,7 @@ describe("TicketFactory", () => {
                 });
             } 
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(NotFoundDomainException);
             await expect(res).rejects.toThrow("This hall doesn't exist");
         });
 
@@ -228,7 +229,7 @@ describe("TicketFactory", () => {
                 });
             };
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(ConflictDomainException);
             await expect(res).rejects.toThrow("This seat is reserved");
         });
     });

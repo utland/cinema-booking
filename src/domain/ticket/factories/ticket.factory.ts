@@ -1,24 +1,18 @@
 import { SESSION_REPOSITORY_TOKEN, type SessionRepository } from "src/domain/session/ports/session.repository";
-import { DomainException } from "../../common/exceptions/base-exception";
 import { DomainFactory } from "../../common/interfaces/domain-factory.i";
 import { Seat } from "../../hall/models/seat.entity";
-import { Session } from "../../session/models/session.entity";
 import { Ticket, TicketStatus } from "../models/ticket.entity";
 import { TICKET_REPOSITORY_TOKEN, type TicketRepository } from "../ports/ticket.repository";
 import { HALL_REPOSITORY_TOKEN, type HallRepository } from "src/domain/hall/ports/hall.repository";
 import { Inject, Injectable } from "@nestjs/common";
+import { NotFoundDomainException } from "src/domain/common/exceptions/not-found.exception";
+import { ConflictDomainException } from "src/domain/common/exceptions/conflict.exception";
 
 type TicketFactoryArgs = {
     sessionId: string,
     seatId: string,
     userId: string,
     hallId: string,
-}
-
-interface TicketPricingInfo {
-    basePrice: number,
-    startTime: Date,
-    hasNeighbour: boolean
 }
 
 @Injectable()
@@ -38,20 +32,20 @@ export class TicketFactory implements DomainFactory<Ticket> {
         const { seatId, sessionId, userId, hallId } = args;
 
         const session = await this.sessionRepo.findById(sessionId);
-        if (!session) throw new DomainException(404, "Session doesn't exist");
+        if (!session) throw new NotFoundDomainException("Session doesn't exist");
 
         if (session.timePeriod.hasReservationPassed()) {
-            throw new DomainException(409, "Booking time has passed")
+            throw new ConflictDomainException("Booking time has passed")
         }
 
         const hall = await this.hallRepo.findById(hallId);
-        if (!hall) throw new DomainException(404, "This hall doesn't exist");
+        if (!hall) throw new NotFoundDomainException("This hall doesn't exist");
 
         const seat = hall.findSeat(seatId);
         
         const seatTickets = await this.ticketRepo.findBySeat(seatId, sessionId);
         const isReserved = seatTickets.some(item => item.status === TicketStatus.RESERVED);
-        if (isReserved) throw new DomainException(409, "This seat is reserved");
+        if (isReserved) throw new ConflictDomainException("This seat is reserved");
 
         const hasNeighbour = await this.hasNeighbour(sessionId, userId, hall.seats, seat);
 

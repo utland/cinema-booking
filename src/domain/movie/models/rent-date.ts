@@ -1,5 +1,5 @@
+import { BadRequestException } from "@nestjs/common";
 import { ValueObject } from "src/domain/common/domain-objects/value-object";
-import { DomainException } from "src/domain/common/exceptions/base-exception";
 
 export class RentDate implements ValueObject {
     constructor(
@@ -11,7 +11,7 @@ export class RentDate implements ValueObject {
 
     private validateDates(start: Date, end: Date): void {
         if (start >= end) {
-            throw new DomainException(400, "End time must be greater than start time for movie");
+            throw new BadRequestException("End time must be greater than start time for movie");
         }
     }
 
