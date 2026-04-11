@@ -1,3 +1,4 @@
+import { areIntervalsOverlapping, isWithinInterval } from "date-fns";
 import { ValueObject } from "src/domain/common/domain-objects/value-object";
 import { BadRequestDomainException } from "src/domain/common/exceptions/bad-request.exception";
 
@@ -20,6 +21,17 @@ export class TimePeriod implements ValueObject {
         const deadLine = new Date(this._startTime.getTime() - 10 * 60 * 1000);
 
         return deadLine < now;
+    }
+
+    public isOverlapped(start: Date, end: Date) {
+        return areIntervalsOverlapping(
+            { start: this._startTime, end: this._endTime }, { start, end }
+        );
+    }
+
+    public isInRange(start: Date, end: Date) {
+        const range = { start, end };
+        return isWithinInterval(this._startTime, range) && isWithinInterval(this._endTime, range);
     }
 
     private validatePoints(start: Date, end: Date): void {

@@ -15,6 +15,8 @@ import { MovieController } from 'src/presentation/movie/movie.controller';
     MovieService, 
     TypeOrmMovieMapper,
     { provide: MOVIE_REPOSITORY_TOKEN, useClass: TypeOrmMovieRepository}
-  ]
+  ],
+    exports: [MOVIE_REPOSITORY_TOKEN]
+  
 })
 export class MovieModule {}

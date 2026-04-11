@@ -10,6 +10,7 @@ import { toSessionWithHallDto } from './dtos/mappers/to-session-with-hall';
 import { SessionWithHallDto } from './dtos/response/session-with-hall.dto';
 import { SESSION_REPOSITORY_TOKEN, type SessionRepository } from 'src/domain/session/ports/session.repository';
 import { HALL_REPOSITORY_TOKEN, type HallRepository } from 'src/domain/hall/ports/hall.repository';
+import { SessionFactory } from 'src/domain/session/factories/session.factory';
 
 @Injectable()
 export class SessionService {
@@ -21,13 +22,17 @@ export class SessionService {
     private readonly hallRepo: HallRepository,
 
     @Inject(TICKET_REPOSITORY_TOKEN)
-    private readonly ticketRepo: TicketRepository
+    private readonly ticketRepo: TicketRepository,
+
+    private readonly sessionFactory: SessionFactory
   ) {}
 
   public async create(
     { startTime, finishTime, basePrice, movieId, hallId }: CreateSessionDto
   ): Promise<void> {
-    const session = new Session(movieId, hallId, basePrice, startTime, finishTime);
+    const session = await this.sessionFactory.create({ 
+      movieId, hallId, basePrice, startTime, endTime: finishTime 
+    });
     
     await this.sessionRepo.save(session);
   }
