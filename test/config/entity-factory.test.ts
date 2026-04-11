@@ -1,18 +1,18 @@
 import { INestApplication } from "@nestjs/common";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import request from 'supertest';
+import request from "supertest";
 import { Repository } from "typeorm";
 import { adminTest, hallTest, ITestPayload, movieTest, sessionTest, tokenName, userTest } from "./dtos.test";
-import { TypeOrmUser } from "src/infrastructure/persistence/user/entities/typeorm-user.entity";
-import { Role } from "src/domain/user/models/user.entity";
-import { TypeOrmHall } from "src/infrastructure/persistence/hall/entities/typeorm-hall.entity";
-import { TypeOrmSeat } from "src/infrastructure/persistence/hall/entities/typeorm-seat.entity";
-import { CreateMovieApiDto } from "src/presentation/movie/dtos/create-movie-api.dto";
-import { TypeOrmMovie } from "src/infrastructure/persistence/movie/entities/typeorm-movie.entity";
-import { TypeOrmTicket } from "src/infrastructure/persistence/ticket/entities/typeorm-ticket.entity";
-import { CreateSessionApiDto } from "src/presentation/session/dtos/create-session-api.dto";
-import { TypeOrmSession } from "src/infrastructure/persistence/session/entities/typeorm-session.entity";
 import { randomUUID } from "crypto";
+import { TypeOrmUser } from "src/contexts/identity/infrastructure/persistence/entities/typeorm-user.entity";
+import { Role } from "src/common/domain/enums/user-role.enum";
+import { TypeOrmHall } from "src/contexts/catalog/infrastructure/hall/entities/typeorm-hall.entity";
+import { TypeOrmSeat } from "src/contexts/catalog/infrastructure/hall/entities/typeorm-seat.entity";
+import { TypeOrmMovie } from "src/contexts/catalog/infrastructure/movie/entities/typeorm-movie.entity";
+import { CreateMovieApiDto } from "src/contexts/catalog/presentation/movie/dtos/create-movie-api.dto";
+import { CreateSessionApiDto } from "src/contexts/catalog/presentation/session/dtos/create-session-api.dto";
+import { TypeOrmSession } from "src/contexts/catalog/infrastructure/session/entities/typeorm-session.entity";
+import { TypeOrmTicket } from "src/contexts/booking/infrastructure/persistence/typeorm-ticket.entity";
 
 export class EntityFactory {
     server: any;
@@ -50,7 +50,7 @@ export class EntityFactory {
             id: admin.id,
             login: adminTest.login
         });
-        
+
         return tokens;
     }
 
@@ -85,7 +85,7 @@ export class EntityFactory {
 
         const seatsOrm = await seatRepo.save(seats);
 
-        return seatsOrm.map(seat => seat.id);
+        return seatsOrm.map((seat) => seat.id);
     }
 
     public async createMovie(customMovieTest?: Partial<CreateMovieApiDto>): Promise<string> {
@@ -104,7 +104,14 @@ export class EntityFactory {
 
     public async createTicket(sessionId: string, seatId: string, userId: string): Promise<string> {
         const ticketRepo = this.app.get<Repository<TypeOrmTicket>>(getRepositoryToken(TypeOrmTicket));
-        const { id } = await ticketRepo.save({ sessionId, seatId, userId, price: 100, id: randomUUID(), createdAt: new Date() });
+        const { id } = await ticketRepo.save({
+            sessionId,
+            seatId,
+            userId,
+            price: 100,
+            id: randomUUID(),
+            createdAt: new Date()
+        });
 
         return id;
     }

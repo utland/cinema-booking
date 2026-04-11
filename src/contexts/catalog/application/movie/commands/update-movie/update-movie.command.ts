@@ -1,0 +1,15 @@
+import { Command } from "@nestjs/cqrs";
+
+export class UpdateMovieCommand extends Command<void> {
+    constructor(
+        public readonly movieId: string,
+        public readonly title: string,
+        public readonly duration: number,
+        public readonly description: string,
+        public readonly genre: string,
+        public readonly rentStart: Date,
+        public readonly rentEnd: Date
+    ) {
+        super();
+    }
+}

@@ -16,5 +16,8 @@ export const testConfig: ConfigType = {
     jwt: {
         secret: "test-secret",
         expiresIn: "1m"
+    },
+    stripe: {
+        secret: "fake-token"
     }
 };

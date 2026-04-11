@@ -1,45 +1,29 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { appSchema } from './config/schema';
-import { databaseConfig } from './config/database.config';
-import { jwtConfig } from './config/jwt.config';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from 'src/presentation/common/guards/auth.guard';
-import { RolesGuard } from 'src/presentation/common/guards/role.guard';
-import { InfrastructureModule } from './modules/infrastructure.module';
-import { HallModule } from './modules/hall.module';
-import { MovieModule } from './modules/movie.module';
-import { SessionModule } from './modules/session.module';
-import { TicketModule } from './modules/ticket.module';
-import { UserModule } from './modules/user.module';
-import { CqrsModule } from '@nestjs/cqrs';
+import { Module } from "@nestjs/common";
+import { APP_FILTER, APP_GUARD } from "@nestjs/core";
+import { CommonModule } from "./modules/common.module";
+import { CatalogModule } from "./modules/catalog.module";
+import { BookingModule } from "./modules/booking.module";
+import { IdentityModule } from "./modules/identity.module";
+import { NotificationsModule } from "./modules/notifications.module";
+import { AuthGuard } from "src/common/presentation/guards/auth.guard";
+import { RolesGuard } from "src/common/presentation/guards/role.guard";
+import { DomainExceptionFilter } from "src/common/application/nest-filters/domain-exception.filter";
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validationSchema: appSchema,
-      load: [databaseConfig, jwtConfig],
-    }),
-
-    CqrsModule.forRoot(),
-
-    InfrastructureModule,
-    HallModule,
-    MovieModule,
-    SessionModule,
-    TicketModule,
-    UserModule
-  ],
-  providers: [
-    { 
-      provide: APP_GUARD, 
-      useClass: AuthGuard 
-    }, 
-    { 
-      provide: APP_GUARD, 
-      useClass: RolesGuard,
-    }
-  ]
+    imports: [CommonModule, CatalogModule, BookingModule, IdentityModule, NotificationsModule],
+    providers: [
+        {
+            provide: APP_GUARD,
+            useClass: AuthGuard
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard
+        },
+        {
+            provide: APP_FILTER,
+            useClass: DomainExceptionFilter
+        }
+    ]
 })
 export class AppModule {}

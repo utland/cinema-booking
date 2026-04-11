@@ -1,165 +1,167 @@
-import { TestBuilder } from './config/builder.test';
-import { EntityFactory } from './config/entity-factory.test';
-import request from 'supertest';
-import { ITestPayload, tokenName } from './config/dtos.test';
-import { HallType } from 'src/domain/hall/models/hall.entity';
-import { UpdateSeatsApiDto } from 'src/presentation/hall/dtos/update-seats-api.dto';
-import { CreateHallApiDto } from 'src/presentation/hall/dtos/create-hall-api.dto';
+import { TestBuilder } from "./config/builder.test";
+import { EntityFactory } from "./config/entity-factory.test";
+import request from "supertest";
+import { ITestPayload, tokenName } from "./config/dtos.test";
+import { CreateHallApiDto } from "src/contexts/catalog/presentation/hall/dtos/create-hall-api.dto";
+import { HallType } from "src/contexts/catalog/domain/hall/models/hall.entity";
 
-describe('HallModule (e2e)', () => {
-  let builder: TestBuilder;
-  let entityFactory: EntityFactory;
-  let tokens: Map<tokenName, ITestPayload>;
-  let server: any;
+describe("HallModule (e2e)", () => {
+    let builder: TestBuilder;
+    let entityFactory: EntityFactory;
+    let tokens: Map<tokenName, ITestPayload>;
+    let server: any;
 
-  beforeAll(async () => {
-    builder = await TestBuilder.create();
-    await builder.clearDb();
-    
-    server = builder.app.getHttpServer();
-    entityFactory = new EntityFactory(builder.app, server);
-    tokens = await entityFactory.createUsers();
-  }, 15000);
+    beforeAll(async () => {
+        builder = await TestBuilder.create();
+        await builder.clearDb();
 
-  afterEach(async () => {
-    await builder.clearDb(["users"]);
-  });
+        server = builder.app.getHttpServer();
+        entityFactory = new EntityFactory(builder.app, server);
+        tokens = await entityFactory.createUsers();
+    }, 15000);
 
-  afterAll(async () => {
-    await builder.closeApp();
-  });
-
-  describe('POST /hall', () => {
-    const createHallDto: CreateHallApiDto = {
-      name: 'Test Hall',
-      seats: [{ row: 1, column: 1 }, { row: 1, column: 2 }],
-      type: HallType.STANDART
-    };
-
-    it('should be available only for ADMIN', async () => {
-      await request(server)
-        .post('/hall')
-        .set('Authorization', `Bearer ${tokens.get("user")?.token}`)
-        .send(createHallDto)
-        .expect(403);
-    })
-
-    it('should create a new hall', async () => {
-      await request(server)
-        .post('/hall')
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .send(createHallDto)
-        .expect(201);
+    afterEach(async () => {
+        await builder.clearDb(["users"]);
     });
-  });
 
-  describe('GET /hall', () => {
-    it('should return a list of halls', async () => {
-      const res = await request(server)
-        .get('/hall')
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .expect(200);
-
-      expect(Array.isArray(res.body)).toBe(true);
+    afterAll(async () => {
+        await builder.closeApp();
     });
-  });
 
-  describe('GET /hall/:id', () => {
-    it('should return hall data', async () => {
-      const hallId = await entityFactory.createHall();
+    describe("POST /hall", () => {
+        const createHallDto: CreateHallApiDto = {
+            name: "Test Hall",
+            seats: [
+                { row: 1, column: 1 },
+                { row: 1, column: 2 }
+            ],
+            type: HallType.STANDART
+        };
 
-      const res = await request(server)
-        .get(`/hall/${hallId}`)
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .expect(200);
+        it("should be available only for ADMIN", async () => {
+            await request(server)
+                .post("/hall")
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .send(createHallDto)
+                .expect(403);
+        });
 
-      expect(res.body.name).toBeDefined();
-      expect(res.body.type).toBe(HallType.STANDART);
-      expect(res.body.seats).toBeDefined();
+        it("should create a new hall", async () => {
+            await request(server)
+                .post("/hall")
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .send(createHallDto)
+                .expect(201);
+        });
     });
-  });
 
-  describe('PATCH /hall/:id', () => {
-    const updateHallDto = {
-      name: 'Updated Hall',
-      type: HallType.VIP,
-    };
+    describe("GET /hall", () => {
+        it("should return a list of halls", async () => {
+            const res = await request(server)
+                .get("/hall")
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .expect(200);
 
-    it("should be available only for ADMIN", async () => {
-      await request(server)
-        .patch(`/hall/${1}`)
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .send(updateHallDto)
-        .expect(403);
-    })
-
-    it('should update a hall successfully', async () => {
-      const hallId = await entityFactory.createHall();
-
-      await request(server)
-        .patch(`/hall/${hallId}`)
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .send(updateHallDto)
-        .expect(200);
+            expect(Array.isArray(res.body)).toBe(true);
+        });
     });
-  });
 
-  describe('PATCH /hall/seats', () => {
-    it("should be available only for ADMIN", async () => {
-      await request(server)
-        .patch(`/hall/seats`)
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .send({})
-        .expect(403);
-    })
+    describe("GET /hall/:id", () => {
+        it("should return hall data", async () => {
+            const hallId = await entityFactory.createHall();
 
-    it('should update seats successfully', async () => {
-      const hallId = await entityFactory.createHall();
-      await entityFactory.createSeats(hallId, 3);
+            const res = await request(server)
+                .get(`/hall/${hallId}`)
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .expect(200);
 
-      const updateSeatsDto: UpdateSeatsApiDto = { 
-        hallId,
-        seats: [
-          { row: 1, column: 1 },
-          { row: 1, column: 2 }
-        ] 
-      };
-
-      await request(server)
-        .patch(`/hall/seats`)
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .send(updateSeatsDto)
-        .expect(200);
-      
-      await request(server)
-        .get(`/hall/${hallId}`)
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .expect(200)
-        .expect(res => res.body.seats.length === 2);
-      });
-  });
-
-  describe('DELETE /hall/:id', () => {
-    it("should be available only for ADMIN", async () => {
-      await request(server)
-        .delete(`/hall/1`)
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .expect(403);
-    })
-
-    it('should be available only for ADMIN', async () => {
-      const hallId = await entityFactory.createHall();
-      await entityFactory.createSeats(hallId, 3)
-
-      await request(server)
-        .delete(`/hall/${hallId}`)
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .expect(200);
-
-      await request(server)
-        .get(`/hall/${hallId}`)
-        .set('Authorization', `Bearer ${tokens.get('admin')?.token}`)
-        .expect(404);
+            expect(res.body.name).toBeDefined();
+            expect(res.body.type).toBe(HallType.STANDART);
+            expect(res.body.seats).toBeDefined();
+        });
     });
-  });
-})
+
+    describe("PATCH /hall/:id", () => {
+        const updateHallDto = {
+            name: "Updated Hall",
+            type: HallType.VIP
+        };
+
+        it("should be available only for ADMIN", async () => {
+            await request(server)
+                .patch(`/hall/${1}`)
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .send(updateHallDto)
+                .expect(403);
+        });
+
+        it("should update a hall successfully", async () => {
+            const hallId = await entityFactory.createHall();
+
+            await request(server)
+                .patch(`/hall/${hallId}`)
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .send(updateHallDto)
+                .expect(200);
+        });
+    });
+
+    describe("PATCH /hall/seats", () => {
+        it("should be available only for ADMIN", async () => {
+            await request(server)
+                .patch(`/hall/seats`)
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .send({})
+                .expect(403);
+        });
+
+        it("should update seats successfully", async () => {
+            const hallId = await entityFactory.createHall();
+            await entityFactory.createSeats(hallId, 3);
+
+            const updateSeatsDto: UpdateSeatsApiDto = {
+                hallId,
+                seats: [
+                    { row: 1, column: 1 },
+                    { row: 1, column: 2 }
+                ]
+            };
+
+            await request(server)
+                .patch(`/hall/seats`)
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .send(updateSeatsDto)
+                .expect(200);
+
+            await request(server)
+                .get(`/hall/${hallId}`)
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .expect(200)
+                .expect((res) => res.body.seats.length === 2);
+        });
+    });
+
+    describe("DELETE /hall/:id", () => {
+        it("should be available only for ADMIN", async () => {
+            await request(server)
+                .delete(`/hall/1`)
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .expect(403);
+        });
+
+        it("should be available only for ADMIN", async () => {
+            const hallId = await entityFactory.createHall();
+            await entityFactory.createSeats(hallId, 3);
+
+            await request(server)
+                .delete(`/hall/${hallId}`)
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .expect(200);
+
+            await request(server)
+                .get(`/hall/${hallId}`)
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .expect(404);
+        });
+    });
+});
