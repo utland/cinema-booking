@@ -1,90 +1,79 @@
-import { TestBuilder } from './config/builder.test';
-import { ITestPayload, tokenName } from './config/dtos.test';
-import { EntityFactory } from './config/entity-factory.test';
-import request from 'supertest';
+import { TestBuilder } from "./config/builder.test";
+import { ITestPayload, tokenName } from "./config/dtos.test";
+import { EntityFactory } from "./config/entity-factory.test";
+import request from "supertest";
 
-describe('UserModule (e2e)', () => {
-  let builder: TestBuilder;
-  let entityFactory: EntityFactory;
-  let tokens: Map<tokenName, ITestPayload>;
-  let server: any;
+describe("UserModule (e2e)", () => {
+    let builder: TestBuilder;
+    let entityFactory: EntityFactory;
+    let tokens: Map<tokenName, ITestPayload>;
+    let server: any;
 
-  beforeAll(async () => {
-    builder = await TestBuilder.create();
-    server = builder.app.getHttpServer();
+    beforeAll(async () => {
+        builder = await TestBuilder.create();
+        server = builder.app.getHttpServer();
 
-    entityFactory = new EntityFactory(builder.app, builder.app.getHttpServer());
-    tokens = await entityFactory.createUsers();
-  }, 15000);
+        entityFactory = new EntityFactory(builder.app, builder.app.getHttpServer());
+        tokens = await entityFactory.createUsers();
+    }, 15000);
 
-  afterAll(async () => {
-    await builder.closeApp();
-  });
-
-  describe('POST /user', () => {
-    it('should be available only for ADMIN', async () => {
-      
+    afterAll(async () => {
+        await builder.closeApp();
     });
 
-    it('should create an user', async () => {
-      
+    describe("GET /user", () => {
+        it("should return current user data", async () => {
+            const response = await request(server)
+                .get("/user")
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .expect(200);
+
+            expect(response.body.id).toBe(tokens.get("user")?.id);
+            expect(response.body.login).toBe(tokens.get("user")?.login);
+            expect(response.body.email).toBeDefined();
+            expect(response.body.firstName).toBeDefined();
+            expect(response.body.lastName).toBeDefined();
+            expect(response.body.password).toBeUndefined();
+        });
     });
-  });
 
-  describe('GET /user', () => {
-    it('should return current user data', async () => {
-      const response = await request(server)
-        .get('/user')
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .expect(200);
+    describe("PATCH /user", () => {
+        it("should update current user data", async () => {
+            const updateUserDto = { firstName: "UpdatedName" };
 
-      expect(response.body.id).toBe(tokens.get('user')?.id);
-      expect(response.body.login).toBe(tokens.get('user')?.login);
-      expect(response.body.email).toBeDefined();
-      expect(response.body.firstName).toBeDefined();
-      expect(response.body.lastName).toBeDefined();
-      expect(response.body.password).toBeUndefined();
+            await request(server)
+                .patch("/user")
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .send(updateUserDto)
+                .expect(200);
+
+            const res = await request(server)
+                .get("/user")
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .expect(200);
+
+            expect(res.body.firstName).toBe(updateUserDto.firstName);
+        });
     });
-  });
 
-  describe('PATCH /user', () => {
-    it('should update current user data', async () => {
-      const updateUserDto = { firstName: 'UpdatedName' };
+    describe("DELETE /user/:id", () => {
+        it("should be available only for ADMIN", async () => {
+            await request(server)
+                .delete(`/user/${1}`)
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .expect(403);
+        });
 
-      await request(server)
-        .patch('/user')
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .send(updateUserDto)
-        .expect(200);
+        it("should delete an user", async () => {
+            await request(server)
+                .delete(`/user/${tokens.get("user")?.id}`)
+                .set("Authorization", `Bearer ${tokens.get("admin")!.token}`)
+                .expect(200);
 
-      const res = await request(server)
-        .get('/user')
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .expect(200);
-
-      expect(res.body.firstName).toBe(updateUserDto.firstName);
+            await request(server)
+                .get("/user")
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .expect(404);
+        });
     });
-  });
-
-  describe('DELETE /user/:id', () => {
-    it ("should be available only for ADMIN", async () => {
-      await request(server)
-        .delete(`/user/${1}`)
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .expect(403);
-    })
-
-    it('should delete an user', async () => {
-      await request(server)
-        .delete(`/user/${tokens.get('user')?.id}`)
-        .set('Authorization', `Bearer ${tokens.get('admin')!.token}`)
-        .expect(200);
-
-      await request(server)
-        .get('/user')
-        .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-        .expect(404);
-
-    });
-  });
 });

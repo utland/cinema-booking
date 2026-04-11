@@ -6,7 +6,7 @@ import { Hall, HallType } from "src/hall/entities/hall.entity";
 import { Seat } from "src/hall/entities/seat.entity";
 import { Movie } from "src/movie/entities/movie.entity";
 import { User } from "src/user/entities/user.entity";
-import request from 'supertest';
+import request from "supertest";
 import { Repository } from "typeorm";
 import { adminTest, hallTest, ITestPayload, movieTest, sessionTest, tokenName, userTest } from "./dtos.test";
 import { CreateMovieDto } from "src/movie/dto/create-movie.dto";
@@ -50,7 +50,7 @@ export class EntityFactory {
             id: admin.id,
             login: adminTest.login
         });
-        
+
         return tokens;
     }
 
@@ -85,7 +85,7 @@ export class EntityFactory {
 
         const seatsOrm = await seatRepo.save(seats);
 
-        return seatsOrm.map(seat => seat.id);
+        return seatsOrm.map((seat) => seat.id);
     }
 
     public async createMovie(customMovieTest?: Partial<CreateMovieDto>): Promise<string> {
