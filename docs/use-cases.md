@@ -71,7 +71,9 @@
     1. System displays the "Model grid for hall" showing available and taken seats.
     2. User selects one or more available seats.
     3. System temporarily reserves the seats for a specific time window.
+    4. System actives discounts for payment if conditions is completed
 * **Alternative Scenarios / Errors:**
+    * **Booking time is ended:** If the start to session is less than 10 minutes, the system returns error
     * **Seat taken during selection:** If another user books the seat simultaneously, the system reserved the seat and displays an error.
 
 ---
@@ -109,28 +111,64 @@
     2. Admin saves the record.
     3. System adds the movie to the database.
 * **Alternative Scenarios / Errors:**
-    * **Missing Information:** System prevents saving if mandatory fields are empty.
+    * **Missing Information:** System prevents saving if mandatory fields are incorrect.
 
 ---
 
-## 10. Create Sessions
+## 10. Update a Movie
+* **Actor:** Admin
+* **Preconditions:** Admin is logged in, Movie is created
+* **Main Scenario:**
+    1. Admin enters movie details (title, genre, description, duration).
+    2. Admin saves the record.
+    3. System updates/deletes the movie info in the database.
+* **Alternative Scenarios / Errors:**
+    * **Missing Information:** System prevents saving if mandatory fields are incorrect.
+    * **Movie is in rent** System prevents saving if movie is streaming now.
+
+---
+
+## 11. Create Sessions
 * **Actor:** Admin
 * **Preconditions:** At least one movie exists; Admin is logged in.
 * **Main Scenario:**
     1. Admin selects a movie.
     2. Admin assigns a date, time, and specific hall.
-    3. System generates the session schedule.
+    3. System generates the session.
 * **Alternative Scenarios / Errors:**
     * **Schedule Conflict:** System warns if the hall is already occupied at the selected time.
 
 ---
 
-## 11. Model Grid for Hall
+## 12. Update Sessions
+* **Actor:** Admin
+* **Preconditions:** At least one movie exists; Admin is logged in.
+* **Main Scenario:**
+    1. Admin selects a session.
+    2. Admin assigns a date, time, and specific hall.
+    3. System updates/deletes the session.
+* **Alternative Scenarios / Errors:**
+    * **Schedule Conflict:** System warns if the hall is already occupied at the selected time.
+    * **Session is in rent** System prevents saving if session is streaming now.
+
+---
+
+## 13. Model Grid for Hall
 * **Actor:** Admin
 * **Preconditions:** Admin is creating or editing a session.
 * **Main Scenario:**
     1. Admin defines the configuration of the hall (rows and seats).
-    2. Admin sets seat statuses (e.g., VIP, Standard, Disabled).
-    3. System saves the hall configuration for the session.
+    2. Admin sets hall info.
+    3. System saves the hall configuration.
 * **Alternative Scenarios / Errors:**
     * **Invalid Dimensions:** System prevents saving if the layout is mathematically impossible for the selected hall.
+
+## 14. Update Grid for Hall
+* **Actor:** Admin
+* **Preconditions:** Admin is creating or editing a session.
+* **Main Scenario:**
+    1. Admin defines the configuration of the hall (rows and seats).
+    2. Admin sets hall info.
+    3. System updates/delete the hall configuration.
+* **Alternative Scenarios / Errors:**
+    * **Sessions are active:** System prevents saving if there are unfinished sessions in hall

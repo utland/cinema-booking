@@ -3,10 +3,11 @@ import { TicketFactory } from "./ticket.factory";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Ticket } from "../models/ticket.entity";
 import { TicketStatus } from "src/common/domain/enums/ticket-status.enum";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
 import { CATALOG_GATEWAY, CatalogBookingGateway } from "../ports/catalog-booking.port";
 import { SessionBooking } from "../models/session-booking";
 import { SeatBooking } from "../models/seat-booking";
+import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
+import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
 
 const mockTicketRepository = {
     findBySeat: jest.fn(),
@@ -128,7 +129,7 @@ describe("TicketFactory", () => {
                 });
             };
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(ConflictDomainException);
             await expect(res).rejects.toThrow("This seat is reserved");
         });
 
@@ -144,7 +145,7 @@ describe("TicketFactory", () => {
                 });
             };
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(NotFoundDomainException);
             await expect(res).rejects.toThrow("Session doesn't exist");
         });
 
@@ -161,7 +162,7 @@ describe("TicketFactory", () => {
                 });
             };
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(NotFoundDomainException);
             await expect(res).rejects.toThrow("This hall is not found");
         });
 
@@ -178,7 +179,7 @@ describe("TicketFactory", () => {
                 });
             };
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(NotFoundDomainException);
             await expect(res).rejects.toThrow("This seat is not found");
         });
 
@@ -200,7 +201,7 @@ describe("TicketFactory", () => {
                 });
             };
 
-            await expect(res).rejects.toThrow(DomainException);
+            await expect(res).rejects.toThrow(ConflictDomainException);
             await expect(res).rejects.toThrow("Booking time has passed");
         });
     });

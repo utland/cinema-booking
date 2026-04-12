@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { HallAccessService } from "./hall-access.service";
 import { SESSION_REPOSITORY_TOKEN, SessionRepository } from "../../session/ports/session.repository";
 import { Session } from "../../session/models/session.entity";
+import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
 
 describe("HallAccessService", () => {
     let service: HallAccessService;
@@ -67,10 +68,9 @@ describe("HallAccessService", () => {
 
             try {
                 await service.checkOngoingSessions(ongoingSession.hallId);
-            } catch (err) {
-                expect(err).toBeInstanceOf(DomainException);
+            } catch (err: any) {
+                expect(err).toBeInstanceOf(ConflictDomainException);
                 expect(err.message).toBe("There are unfinished sessions in this hall");
-                expect(err.status).toBe(409);
             }
         });
 
@@ -95,10 +95,9 @@ describe("HallAccessService", () => {
 
             try {
                 await service.checkOngoingSessions(ongoingSession.hallId);
-            } catch (err) {
-                expect(err).toBeInstanceOf(DomainException);
+            } catch (err: any) {
+                expect(err).toBeInstanceOf(ConflictDomainException);
                 expect(err.message).toBe("There are unfinished sessions in this hall");
-                expect(err.status).toBe(409);
             }
         });
     });

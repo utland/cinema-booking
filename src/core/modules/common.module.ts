@@ -12,12 +12,15 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { databaseConfig } from "../config/database.config";
 import { jwtConfig } from "../config/jwt.config";
 import { appSchema } from "../config/schema";
-import { APP_GUARD } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "src/common/presentation/guards/auth.guard";
 import { RolesGuard } from "src/common/presentation/guards/role.guard";
-import { IdentityApi } from "src/contexts/identity/api/indentity-api";
 import { IdentityModule } from "./identity.module";
 import { stripeConfig } from "../config/stripe.config";
+import { BadRequestDomainException } from "src/common/domain/domain-exceptions/bad-request.exception";
+import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
+import { ForbiddenDomainException } from "src/common/domain/domain-exceptions/forbidden.exception";
+import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
 
 @Global()
 @Module({
@@ -49,7 +52,23 @@ import { stripeConfig } from "../config/stripe.config";
         {
             provide: APP_GUARD,
             useClass: RolesGuard
-        }
+        },
+        {
+            provide: APP_FILTER,
+            useClass: BadRequestDomainException
+        },
+        {
+            provide: APP_FILTER,
+            useClass: NotFoundDomainException
+        },
+        {
+            provide: APP_FILTER,
+            useClass: ForbiddenDomainException
+        },
+        {
+            provide: APP_FILTER,
+            useClass: ConflictDomainException
+        },
     ]
 })
 export class CommonModule {}

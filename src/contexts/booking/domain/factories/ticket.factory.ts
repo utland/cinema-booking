@@ -1,11 +1,12 @@
 import { DomainFactory } from "src/common/interfaces/domain-factory.i";
 import { TICKET_REPOSITORY_TOKEN, type TicketRepository } from "../ports/ticket.repository";
 import { Inject, Injectable } from "@nestjs/common";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
 import { Ticket } from "../models/ticket.entity";
 import { TicketStatus } from "src/common/domain/enums/ticket-status.enum";
 import { CATALOG_GATEWAY, type CatalogBookingGateway } from "../ports/catalog-booking.port";
 import { SeatBooking } from "../models/seat-booking";
+import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
+import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
 
 type TicketFactoryArgs = {
     sessionId: string;
@@ -29,21 +30,21 @@ export class TicketFactory implements DomainFactory<Ticket> {
 
         const session = await this.catalogGateway.getSession(sessionId);
 
-        if (!session) throw new DomainException(404, "Session doesn't exist");
+        if (!session) throw new NotFoundDomainException("Session doesn't exist");
         if (session.hasReservationPassed()) {
-            throw new DomainException(409, "Booking time has passed");
+            throw new ConflictDomainException("Booking time has passed");
         }
 
         const seats = await this.catalogGateway.getSeats(hallId);
-        if (!seats) throw new DomainException(404, "This hall is not found");
+        if (!seats) throw new NotFoundDomainException("This hall is not found");
 
         const seat = seats.find((item) => item.id === seatId);
-        if (!seat) throw new DomainException(404, "This seat is not found");
+        if (!seat) throw new NotFoundDomainException("This seat is not found");
 
         const tickets = await this.ticketRepo.findBySeat(seatId, sessionId);
 
         const isReserved = tickets.some((item) => item.status === TicketStatus.RESERVED);
-        if (isReserved) throw new DomainException(409, "This seat is reserved");
+        if (isReserved) throw new ConflictDomainException("This seat is reserved");
 
         const ticket = new Ticket(TicketStatus.RESERVED, session.price, sessionId, seatId, userId);
 

@@ -5,5 +5,5 @@ export const SESSION_READ_REPOSITORY_TOKEN = "SessionReadRepository";
 
 export interface SessionReadRepository {
     findSessionsInMovie(movieId: string, sessionDate: Date): Promise<SessionInMovieDto[]>;
-    findSessionWithHall(sessionId: string): Promise<SessionWithHallDto>;
+    findSessionWithHall(sessionId: string): Promise<SessionWithHallDto | null>;
 }

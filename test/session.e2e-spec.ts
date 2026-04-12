@@ -156,10 +156,10 @@ describe("SessionModule (e2e)", () => {
                 .send(updateSessionDto)
                 .expect(200);
 
-            // await request(builder.app.getHttpServer())
-            //   .get(`/session/${sessionId}?hallId=${hallId}`)
-            //   .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-            //   .expect(200);
+            await request(builder.app.getHttpServer())
+              .get(`/session/${sessionId}`)
+              .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
+              .expect(200);
         });
     });
 
@@ -184,10 +184,10 @@ describe("SessionModule (e2e)", () => {
                 .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
                 .expect(200);
 
-            // await request(builder.app.getHttpServer())
-            //   .get(`/session/${sessionId}?hallId=${hallId}`)
-            //   .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-            //   .expect(404);
+            await request(builder.app.getHttpServer())
+              .get(`/session/${sessionId}`)
+              .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
+              .expect(404);
         });
     });
 });

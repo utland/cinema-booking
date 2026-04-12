@@ -1,6 +1,6 @@
 import { AggregateRoot } from "src/common/domain/domain-objects/aggregate-root";
 import { TimePeriod } from "./time-period";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
+import { BadRequestDomainException } from "src/common/domain/domain-exceptions/bad-request.exception";
 
 export class Session extends AggregateRoot {
     private _timePeriod: TimePeriod;
@@ -32,13 +32,13 @@ export class Session extends AggregateRoot {
 
     public checkDeleteCondition() {
         if (this._timePeriod.isInBetween()) {
-            throw new DomainException(400, "Session cannot be deleted, during streaming");
+            throw new BadRequestDomainException("Session cannot be deleted, during streaming");
         }
     }
 
     private checkStateToModify() {
         if (this._timePeriod.isInBetween()) {
-            throw new DomainException(400, "This session is closed for modification");
+            throw new BadRequestDomainException("This session is closed for modification");
         }
     }
 

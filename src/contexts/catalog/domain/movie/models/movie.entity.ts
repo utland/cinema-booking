@@ -1,6 +1,6 @@
 import { AggregateRoot } from "src/common/domain/domain-objects/aggregate-root";
 import { RentDate } from "./rent-date";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
+import { BadRequestDomainException } from "src/common/domain/domain-exceptions/bad-request.exception";
 
 export class Movie extends AggregateRoot {
     private _rentDate: RentDate;
@@ -36,13 +36,13 @@ export class Movie extends AggregateRoot {
 
     public validateDeleteOperation() {
         if (this._rentDate.isGoingNow()) {
-            throw new DomainException(400, "Movie cannot be deleted during streaming");
+            throw new BadRequestDomainException("Movie cannot be deleted during streaming");
         }
     }
 
     private checkStateToModify() {
         if (this._rentDate.isGoingNow()) {
-            throw new DomainException(400, "Movie cannot be changed during streaming");
+            throw new BadRequestDomainException("Movie cannot be changed during streaming");
         }
     }
 

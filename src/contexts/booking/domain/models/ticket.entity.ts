@@ -1,7 +1,8 @@
 import { AggregateRoot } from "src/common/domain/domain-objects/aggregate-root";
 import { Money } from "./money";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
 import { TicketStatus } from "src/common/domain/enums/ticket-status.enum";
+import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
+import { ForbiddenDomainException } from "src/common/domain/domain-exceptions/forbidden.exception";
 
 export class Ticket extends AggregateRoot {
     private _money: Money;
@@ -21,11 +22,11 @@ export class Ticket extends AggregateRoot {
 
     public updateStatus(status: TicketStatus) {
         if (status === TicketStatus.RESERVED) {
-            throw new DomainException(409, "Ticket cannot be reserved again");
+            throw new ConflictDomainException("Ticket cannot be reserved again");
         }
 
         if (status === TicketStatus.PAID && this._status !== TicketStatus.RESERVED) {
-            throw new DomainException(409, "Ticket cannot be paid");
+            throw new ConflictDomainException("Ticket cannot be paid");
         }
 
         this._status = status;
@@ -42,7 +43,7 @@ export class Ticket extends AggregateRoot {
 
     public checkOwnerchip(requestedUserId: string) {
         if (this._userId !== requestedUserId) {
-            throw new DomainException(403, "You are not the owner of this ticket");
+            throw new ForbiddenDomainException("You are not the owner of this ticket");
         }
     }
 

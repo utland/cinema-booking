@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { HALL_REPOSITORY_TOKEN, type HallRepository } from "../domain/hall/ports/hall.repository";
 import { SESSION_REPOSITORY_TOKEN, type SessionRepository } from "../domain/session/ports/session.repository";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
 import { HallCatalogDto } from "./dto/hall-catalog.dto";
 import { SessionCatalogDto } from "./dto/session-catalog.dto";
 import { MovieCatalogDto } from "./dto/movie-catalog.dto";
 import { MOVIE_REPOSITORY_TOKEN, type MovieRepository } from "../domain/movie/ports/movie.repository";
+import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
 
 @Injectable()
 export class CatalogApi {
@@ -38,9 +38,9 @@ export class CatalogApi {
         };
     }
 
-    public async getMovieInfo(movieId: string): Promise<MovieCatalogDto> {
+    public async getMovieInfo(movieId: string): Promise<MovieCatalogDto | null> {
         const movie = await this.movieRepo.findById(movieId);
-        if (!movie) throw new DomainException(404, "Movie doesn't exist");
+        if (!movie) return null
 
         return {
             title: movie.title,

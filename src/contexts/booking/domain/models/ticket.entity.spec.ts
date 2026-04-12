@@ -1,6 +1,8 @@
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
+import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
 import { Ticket } from "./ticket.entity";
 import { TicketStatus } from "src/common/domain/enums/ticket-status.enum";
+import { ForbiddenDomainException } from "src/common/domain/domain-exceptions/forbidden.exception";
+import { BadRequestDomainException } from "src/common/domain/domain-exceptions/bad-request.exception";
 
 describe("Ticket", () => {
     it("should throw DomainException when trying to reserve an already reserved ticket", async () => {
@@ -10,7 +12,7 @@ describe("Ticket", () => {
             ticket.updateStatus(TicketStatus.RESERVED);
         };
 
-        await expect(res).rejects.toThrow(DomainException);
+        await expect(res).rejects.toThrow(ConflictDomainException);
         await expect(res).rejects.toThrow("Ticket cannot be reserved again");
     });
 
@@ -21,7 +23,7 @@ describe("Ticket", () => {
             ticket.updateStatus(TicketStatus.PAID);
         };
 
-        await expect(res).rejects.toThrow(DomainException);
+        await expect(res).rejects.toThrow(ConflictDomainException);
         await expect(res).rejects.toThrow("Ticket cannot be paid");
     });
 
@@ -32,7 +34,7 @@ describe("Ticket", () => {
             ticket.checkOwnerchip("user-2");
         };
 
-        await expect(res).rejects.toThrow(DomainException);
+        await expect(res).rejects.toThrow(ForbiddenDomainException);
         await expect(res).rejects.toThrow("You are not the owner of this ticket");
     });
 
@@ -41,7 +43,7 @@ describe("Ticket", () => {
             const ticket = new Ticket(TicketStatus.RESERVED, -100, "session-1", "seat-1", "user-1", "ticket-1");
         };
 
-        await expect(res).rejects.toThrow(DomainException);
+        await expect(res).rejects.toThrow(BadRequestDomainException);
         await expect(res).rejects.toThrow("Price cannot be less than 0");
     });
 

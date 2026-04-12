@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
 import { SESSION_REPOSITORY_TOKEN, type SessionRepository } from "../../session/ports/session.repository";
+import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
 
 @Injectable()
 export class HallAccessService {
@@ -14,7 +14,7 @@ export class HallAccessService {
 
         for (const item of sessions) {
             if (item.timePeriod.isInBetween()) {
-                throw new DomainException(409, "There are unfinished sessions in this hall");
+                throw new ConflictDomainException("There are unfinished sessions in this hall");
             }
         }
     }

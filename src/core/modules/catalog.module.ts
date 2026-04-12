@@ -39,6 +39,8 @@ import { SESSION_READ_REPOSITORY_TOKEN } from "src/contexts/catalog/application/
 import { TypeOrmSessionReadRepository } from "src/contexts/catalog/infrastructure/session/adapters/typeorm-session.read-repository";
 import { CatalogApi } from "src/contexts/catalog/api/catalog-api";
 import { TypeOrmSessionRepository } from "src/contexts/catalog/infrastructure/session/adapters/typeorm-session.repository";
+import { SessionAccurateTimeService } from "src/contexts/catalog/domain/common/domain-services/session-accurate-time.service";
+import { SessionFactory } from "src/contexts/catalog/domain/session/factories/session.factory";
 
 const commands = [
     CreateHallHandler,
@@ -69,7 +71,9 @@ const queries = [
 
 const mappers = [TypeOrmHallMapper, TypeOrmMovieMapper, TypeOrmSessionMapper];
 
-const domainServices = [HallAccessService];
+const domainServices = [HallAccessService, SessionAccurateTimeService];
+
+const factories = [SessionFactory];
 
 const repositories = [
     { provide: HALL_REPOSITORY_TOKEN, useClass: TypeOrmHallRepository },
@@ -82,7 +86,7 @@ const repositories = [
 @Module({
     imports: [TypeOrmModule.forFeature([TypeOrmHall, TypeOrmSeat, TypeOrmMovie, TypeOrmSession])],
     controllers: [HallController, SessionController, MovieController],
-    providers: [CatalogApi, ...commands, ...queries, ...mappers, ...domainServices, ...repositories],
+    providers: [CatalogApi, ...commands, ...queries, ...mappers, ...domainServices, ...repositories, ...factories],
     exports: [CatalogApi]
 })
 export class CatalogModule {}

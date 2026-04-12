@@ -4,6 +4,7 @@ import request from "supertest";
 import { ITestPayload, tokenName } from "./config/dtos.test";
 import { CreateHallApiDto } from "src/contexts/catalog/presentation/hall/dtos/create-hall-api.dto";
 import { HallType } from "src/contexts/catalog/domain/hall/models/hall.entity";
+import { UpdateSeatsApiDto } from "src/contexts/catalog/presentation/hall/dtos/update-seats-api.dto";
 
 describe("HallModule (e2e)", () => {
     let builder: TestBuilder;
@@ -103,6 +104,14 @@ describe("HallModule (e2e)", () => {
                 .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
                 .send(updateHallDto)
                 .expect(200);
+
+            const res = await request(server)
+                .get(`/hall/${hallId}`)
+                .set("Authorization", `Bearer ${tokens.get("admin")?.token}`)
+                .expect(200);
+
+            expect(res.body.name).toBe(updateHallDto.name);
+            expect(res.body.type).toBe(updateHallDto.type);
         });
     });
 

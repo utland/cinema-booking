@@ -1,6 +1,6 @@
 import { AggregateRoot } from "src/common/domain/domain-objects/aggregate-root";
 import { Seat } from "./seat.entity";
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
+import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
 
 export type SeatInfoType = {
     row: number;
@@ -43,7 +43,7 @@ export class Hall extends AggregateRoot {
 
     public findSeat(seatId: string): Seat {
         const seat = this._seats.find((item) => item.id === seatId);
-        if (!seat) throw new DomainException(404, "Seat doesn't exist");
+        if (!seat) throw new NotFoundDomainException("Seat doesn't exist");
 
         return seat;
     }

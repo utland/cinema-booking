@@ -1,4 +1,5 @@
-import { DomainException } from "src/common/domain/domain-exception/base-exception";
+import { areIntervalsOverlapping, isWithinInterval } from "date-fns";
+import { BadRequestDomainException } from "src/common/domain/domain-exceptions/bad-request.exception";
 import { ValueObject } from "src/common/domain/domain-objects/value-object";
 
 export class TimePeriod implements ValueObject {
@@ -15,9 +16,18 @@ export class TimePeriod implements ValueObject {
         return this._startTime < now && this._endTime > now;
     }
 
+    public isOverlapped(start: Date, end: Date) {
+        return areIntervalsOverlapping({ start: this._startTime, end: this._endTime }, { start, end });
+    }
+
+    public isInRange(start: Date, end: Date) {
+        const range = { start, end };
+        return isWithinInterval(this._startTime, range) && isWithinInterval(this._endTime, range);
+    }
+
     private validatePoints(start: Date, end: Date): void {
         if (start >= end) {
-            throw new DomainException(400, "End time must be greater than start time for session");
+            throw new BadRequestDomainException("End time must be greater than start time for session");
         }
     }
 

@@ -42,7 +42,7 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
         return dto;
     }
 
-    public async findSessionWithHall(sessionId: string): Promise<SessionWithHallDto> {
+    public async findSessionWithHall(sessionId: string): Promise<SessionWithHallDto | null> {
         const rawSql = `
         SELECT
             s.id as "sessionId",
@@ -63,7 +63,8 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
         LEFT JOIN seats se on h.id = se.hall_id
         WHERE s.id = $1
         `;
-        const sessionWithHall = await this.dataSource.query(rawSql, [sessionId, TicketStatus.CANCELLED]);
+        const sessionWithHall = await this.dataSource.query(rawSql, [sessionId, TicketStatus.CANCELLED]); 
+        if (sessionWithHall.length === 0) return null;
 
         const dto = toSessionWithHallDto(sessionWithHall);
 

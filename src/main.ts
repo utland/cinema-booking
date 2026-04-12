@@ -1,7 +1,6 @@
 import { NestFactory, Reflector } from "@nestjs/core";
 import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./core/app.module";
-import { DomainExceptionFilter } from "./common/application/nest-filters/domain-exception.filter";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
