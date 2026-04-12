@@ -1,5 +1,5 @@
+import { BadRequestDomainException } from 'src/domain/common/exceptions/bad-request.exception';
 import { Session } from './session.entity';
-import { DomainException } from '../../common/exceptions/base-exception';
 
 describe('Session', () => {
     it('should throw DomainException when start time is after end time', () => {
@@ -11,10 +11,9 @@ describe('Session', () => {
             new Date('2026-03-31T12:00:00Z'), 
             new Date('2026-03-31T10:00:00Z')
         );
-      } catch (err) {
-        expect(err).toBeInstanceOf(DomainException);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(BadRequestDomainException);
         expect(err.message).toBe('End time must be greater than start time for session');
-        expect(err.status).toBe(400);
       }
     });
 
@@ -29,10 +28,9 @@ describe('Session', () => {
         );
 
         session.setPrice(150);
-      } catch (err) {
-        expect(err).toBeInstanceOf(DomainException);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(BadRequestDomainException);
         expect(err.message).toBe('This session is closed for modification');
-        expect(err.status).toBe(400);
       }
     });
 
@@ -48,10 +46,9 @@ describe('Session', () => {
         );
 
         session.changeTime(new Date('2026-04-01T10:00:00Z'), new Date('2026-04-01T12:00:00Z'));
-      } catch (err) {
-        expect(err).toBeInstanceOf(DomainException);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(BadRequestDomainException);
         expect(err.message).toBe('This session is closed for modification');
-        expect(err.status).toBe(400);
       }
     });
     
@@ -66,10 +63,9 @@ describe('Session', () => {
         );
 
         session.changeTime(new Date('2026-04-01T12:00:00Z'), new Date('2026-04-01T10:00:00Z'));
-      } catch (err) {
-        expect(err).toBeInstanceOf(DomainException);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(BadRequestDomainException);
         expect(err.message).toBe('End time must be greater than start time for session');
-        expect(err.status).toBe(400);
       }
     });
 
@@ -84,10 +80,9 @@ describe('Session', () => {
         );
 
         session.checkDeleteCondition();
-      } catch (err) {
-        expect(err).toBeInstanceOf(DomainException);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(BadRequestDomainException);
         expect(err.message).toBe('Session cannot be deleted, during streaming');
-        expect(err.status).toBe(400);
       }
     });
 });

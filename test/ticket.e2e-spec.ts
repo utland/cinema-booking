@@ -61,11 +61,17 @@ describe('TicketModule (e2e)', () => {
     it('should pay ticket', async () => {
       const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
 
+      const before = performance.now()
+
       await request(server)
         .patch(`/ticket/pay/${ticketId}`)
         .set('Authorization', `Bearer ${user.token}`)
         .expect(200);
-    });
+      
+      const after = performance.now();
+
+      expect(after - before).toBeLessThan(10000);
+    }, 20000);
   });
 
   describe('PATCH /ticket', () => {

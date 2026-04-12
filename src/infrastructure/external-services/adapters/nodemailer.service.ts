@@ -2,6 +2,6 @@ import { NotificationService } from "src/application/extrenal-services/ports/not
 
 export class NodemailerService implements NotificationService {
     public async sendEmail(to: string, message: string): Promise<void> {
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await new Promise((resolve) => setTimeout(resolve, 10000));
     }
 }

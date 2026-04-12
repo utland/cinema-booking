@@ -55,12 +55,12 @@ import { StripeService } from "src/infrastructure/external-services/adapters/str
     ],
     providers: [
         {
-            provide: CREDENTIAL_SERVICE_TOKEN,
-            useClass: TokenService
+          provide: CREDENTIAL_SERVICE_TOKEN,
+          useClass: TokenService
         },
         {
-            provide: PASSWORD_SERVICE_TOKEN,
-            useClass: BcryptService
+          provide: PASSWORD_SERVICE_TOKEN,
+          useClass: BcryptService
         },
         {
           provide: NOTIFICATION_SERVICE_TOKEN,

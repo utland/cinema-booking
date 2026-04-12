@@ -1,5 +1,5 @@
 import { ValueObject } from "src/domain/common/domain-objects/value-object";
-import { DomainException } from "src/domain/common/exceptions/base-exception";
+import { BadRequestDomainException } from "src/domain/common/exceptions/bad-request.exception";
 
 export class RentDate implements ValueObject {
     constructor(
@@ -11,7 +11,7 @@ export class RentDate implements ValueObject {
 
     private validateDates(start: Date, end: Date): void {
         if (start >= end) {
-            throw new DomainException(400, "End time must be greater than start time for movie");
+            throw new BadRequestDomainException("End time must be greater than start time for movie");
         }
     }
 

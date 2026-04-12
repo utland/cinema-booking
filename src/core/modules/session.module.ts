@@ -14,6 +14,9 @@ import { UpdateSessionHandler } from 'src/application/session/commands/update-se
 import { FindSessionWithHallHandler } from 'src/application/session/queries/find-session-with-hall/find-session-with-hall.handler';
 import { FindSessionsByMovieHandler } from 'src/application/session/queries/find-sessions-by-movie/find-sessions-by-movie.handler';
 import { SESSION_READ_REPOSITORY_TOKEN } from 'src/application/session/ports/session.read-repository';
+import { MovieModule } from './movie.module';
+import { SessionFactory } from 'src/domain/session/factories/session.factory';
+import { SessionAccurateTimeService } from 'src/domain/common/domain-services/session-accurate-time.service';
 
 const commands = [
   CreateSessionHandler,
@@ -30,13 +33,16 @@ const queries = [
   imports: [
     TypeOrmModule.forFeature([TypeOrmSession]),
     forwardRef(() => TicketModule),
-    forwardRef(() => HallModule)
+    forwardRef(() => HallModule),
+    MovieModule
   ],
   controllers: [SessionController],
   providers: [
     ...commands,
     ...queries,
     TypeOrmSessionMapper,
+    SessionFactory,
+    SessionAccurateTimeService,
     { provide: SESSION_REPOSITORY_TOKEN, useClass: TypeOrmSessionRepository },
     { provide: SESSION_READ_REPOSITORY_TOKEN, useClass: TypeOrmSessionReadRepository }
   ],
