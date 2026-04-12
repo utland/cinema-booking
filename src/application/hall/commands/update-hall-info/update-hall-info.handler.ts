@@ -9,7 +9,7 @@ export class UpdateHallInfoHandler implements ICommandHandler<UpdateHallInfoComm
     constructor(
         @Inject(HALL_REPOSITORY_TOKEN)
         private readonly hallRepo: HallRepository,
-        
+
         private readonly hallAccessService: HallAccessService
     ) {}
 

@@ -17,7 +17,7 @@ export class TypeOrmSessionRepository implements SessionRepository {
     ) {}
 
     public async findById(id: string): Promise<Session | null> {
-        const sessionOrm = await this.sessionRepo.findOne({ where: { id }});
+        const sessionOrm = await this.sessionRepo.findOne({ where: { id } });
         if (!sessionOrm) return null;
 
         const sessionDomain = this.sessionMapper.toDomain(sessionOrm);
@@ -25,9 +25,9 @@ export class TypeOrmSessionRepository implements SessionRepository {
     }
 
     public async findByHall(hallId: string): Promise<Session[]> {
-        const sessionsOrm = await this.sessionRepo.find({ where: { hallId }});
+        const sessionsOrm = await this.sessionRepo.find({ where: { hallId } });
 
-        const sessionsDomain = sessionsOrm.map(item => this.sessionMapper.toDomain(item));
+        const sessionsDomain = sessionsOrm.map((item) => this.sessionMapper.toDomain(item));
         return sessionsDomain;
     }
 
@@ -42,7 +42,4 @@ export class TypeOrmSessionRepository implements SessionRepository {
 
         await this.sessionRepo.remove(sessionOrm);
     }
-    
-
-    
 }

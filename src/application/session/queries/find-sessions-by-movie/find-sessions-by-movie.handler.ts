@@ -16,5 +16,4 @@ export class FindSessionsByMovieHandler implements IQueryHandler<FindSessionsByM
 
         return result;
     }
-
 }

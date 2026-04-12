@@ -6,11 +6,11 @@ export type SeatInfoType = {
     row: number;
     column: number;
     id?: string;
-}
+};
 
 export enum HallType {
-  STANDART = 'standart',
-  VIP = 'vip',
+    STANDART = "standart",
+    VIP = "vip"
 }
 
 export class Hall extends AggregateRoot {
@@ -20,7 +20,7 @@ export class Hall extends AggregateRoot {
         private _name: string,
         private _type: HallType,
         seatsInfo: SeatInfoType[],
-        id? : string,
+        id?: string
     ) {
         super(id);
 
@@ -42,7 +42,7 @@ export class Hall extends AggregateRoot {
     }
 
     public findSeat(seatId: string): Seat {
-        const seat = this._seats.find(item => item.id === seatId);
+        const seat = this._seats.find((item) => item.id === seatId);
         if (!seat) throw new NotFoundDomainException("Seat doesn't exist");
 
         return seat;

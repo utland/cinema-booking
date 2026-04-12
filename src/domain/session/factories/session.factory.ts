@@ -7,11 +7,11 @@ import { NotFoundDomainException } from "src/domain/common/exceptions/not-found.
 import { SessionAccurateTimeService } from "src/domain/common/domain-services/session-accurate-time.service";
 
 interface SessionFactoryArgs {
-    movieId: string,
-    hallId: string,
-    basePrice: number,
-    startTime: Date,
-    endTime: Date
+    movieId: string;
+    hallId: string;
+    basePrice: number;
+    startTime: Date;
+    endTime: Date;
 }
 
 @Injectable()
@@ -38,9 +38,7 @@ export class SessionFactory implements DomainFactory<Session> {
         const session = new Session(movieId, hallId, basePrice, startTime, endTime);
 
         await this.sessionAccurateTimeService.checkTimeSlot(hallId, session);
-        await this.sessionAccurateTimeService.checkRentRange(
-            movie.rentDate.start, movie.rentDate.end, session
-        );
+        await this.sessionAccurateTimeService.checkRentRange(movie.rentDate.start, movie.rentDate.end, session);
 
         return session;
     }

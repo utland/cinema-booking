@@ -4,7 +4,7 @@ import { BadRequestDomainException } from "src/domain/common/exceptions/bad-requ
 export class RentDate implements ValueObject {
     constructor(
         private readonly _start: Date,
-        private readonly _end: Date,
+        private readonly _end: Date
     ) {
         this.validateDates(_start, _end);
     }
@@ -18,7 +18,7 @@ export class RentDate implements ValueObject {
     public isGoingNow(): boolean {
         const now = new Date();
 
-        return this._end > now && this._start < now; 
+        return this._end > now && this._start < now;
     }
 
     public get start() {

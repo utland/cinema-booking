@@ -14,7 +14,7 @@ export class DeleteHallHandler implements ICommandHandler<DeleteHallCommand> {
 
     public async execute({ hallId }: DeleteHallCommand): Promise<void> {
         this.hallAccessService.checkOngoingSessions(hallId);
-        
+
         const hall = await this.hallRepo.findById(hallId);
         if (!hall) throw new NotFoundException("This hall doesn't exist");
 

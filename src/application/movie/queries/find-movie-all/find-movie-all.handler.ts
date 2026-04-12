@@ -5,7 +5,7 @@ import { MovieListItemDto } from "../dtos/movie-list-item.dto";
 import { MOVIE_READ_REPOSITORY_TOKEN, type MovieReadRepository } from "../../ports/movie.read-repository";
 
 @QueryHandler(FindMovieAllQuery)
-export class FindMovieAllHandler implements IQueryHandler<FindMovieAllQuery>{
+export class FindMovieAllHandler implements IQueryHandler<FindMovieAllQuery> {
     constructor(
         @Inject(MOVIE_READ_REPOSITORY_TOKEN)
         private readonly movieReadRepository: MovieReadRepository

@@ -16,7 +16,7 @@ export class TypeOrmMovieRepository implements MovieRepository {
     ) {}
 
     public async findById(id: string): Promise<Movie | null> {
-        const movieOrm = await this.movieRepo.findOne({ where: { id }});
+        const movieOrm = await this.movieRepo.findOne({ where: { id } });
         if (!movieOrm) return null;
 
         const movieDomain = this.movieMapper.toDomain(movieOrm);
@@ -28,7 +28,7 @@ export class TypeOrmMovieRepository implements MovieRepository {
 
         await this.movieRepo.save(movieOrm);
     }
-    
+
     public async delete(movie: Movie): Promise<void> {
         const movieOrm = this.movieMapper.toOrm(movie);
 

@@ -6,7 +6,7 @@ import { HallEditorDto } from "../dtos/hall-editor.dto";
 import { toHallEditorDto } from "../dtos/mappers/to-hall-editor.mapper";
 
 @QueryHandler(FindHallByIdQuery)
-export class FindHallByIdHandler implements IQueryHandler<FindHallByIdQuery>{
+export class FindHallByIdHandler implements IQueryHandler<FindHallByIdQuery> {
     constructor(
         @Inject(HALL_REPOSITORY_TOKEN)
         private readonly hallRepo: HallRepository

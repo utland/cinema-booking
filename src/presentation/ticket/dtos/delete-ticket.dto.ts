@@ -6,6 +6,6 @@ export class DeleteTicketApiDto {
     userId: string;
 
     @IsNotEmpty()
-    @IsUUID ()
+    @IsUUID()
     ticketId: string;
 }

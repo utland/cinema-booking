@@ -1,6 +1,6 @@
 import { INestApplication } from "@nestjs/common";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import request from 'supertest';
+import request from "supertest";
 import { Repository } from "typeorm";
 import { adminTest, hallTest, ITestPayload, movieTest, sessionTest, tokenName, userTest } from "./dtos.test";
 import { TypeOrmUser } from "src/infrastructure/persistence/user/entities/typeorm-user.entity";
@@ -50,7 +50,7 @@ export class EntityFactory {
             id: admin.id,
             login: adminTest.login
         });
-        
+
         return tokens;
     }
 
@@ -85,7 +85,7 @@ export class EntityFactory {
 
         const seatsOrm = await seatRepo.save(seats);
 
-        return seatsOrm.map(seat => seat.id);
+        return seatsOrm.map((seat) => seat.id);
     }
 
     public async createMovie(customMovieTest?: Partial<CreateMovieApiDto>): Promise<string> {
@@ -104,7 +104,14 @@ export class EntityFactory {
 
     public async createTicket(sessionId: string, seatId: string, userId: string): Promise<string> {
         const ticketRepo = this.app.get<Repository<TypeOrmTicket>>(getRepositoryToken(TypeOrmTicket));
-        const { id } = await ticketRepo.save({ sessionId, seatId, userId, price: 100, id: randomUUID(), createdAt: new Date() });
+        const { id } = await ticketRepo.save({
+            sessionId,
+            seatId,
+            userId,
+            price: 100,
+            id: randomUUID(),
+            createdAt: new Date()
+        });
 
         return id;
     }

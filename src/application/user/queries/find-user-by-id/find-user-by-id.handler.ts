@@ -5,7 +5,7 @@ import { USER_READ_REPOSITORY_TOKEN, type UserReadRepository } from "../../ports
 import { UserProfileDto } from "../dtos/user-profile.dto";
 
 @QueryHandler(FindUserByIdQuery)
-export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery>{
+export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery> {
     constructor(
         @Inject(USER_READ_REPOSITORY_TOKEN)
         private readonly userReadRepository: UserReadRepository
@@ -14,7 +14,7 @@ export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery>{
     async execute({ userId }: FindUserByIdQuery): Promise<UserProfileDto> {
         const user = await this.userReadRepository.getProfile(userId);
         if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
-    
+
         return user;
     }
 }

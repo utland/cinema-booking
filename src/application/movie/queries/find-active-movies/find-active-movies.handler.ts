@@ -11,8 +11,8 @@ export class FindActiveMoviesHandler implements IQueryHandler<FindActiveMoviesQu
         @Inject(MOVIE_READ_REPOSITORY_TOKEN)
         private readonly movieReadRepository: MovieReadRepository
     ) {}
-    
-    async execute(): Promise<MovieListItemDto[]> { 
+
+    async execute(): Promise<MovieListItemDto[]> {
         const activeMovies = await this.movieReadRepository.findActive();
         return activeMovies;
     }

@@ -9,11 +9,11 @@ import { NotFoundDomainException } from "src/domain/common/exceptions/not-found.
 import { ConflictDomainException } from "src/domain/common/exceptions/conflict.exception";
 
 type TicketFactoryArgs = {
-    sessionId: string,
-    seatId: string,
-    userId: string,
-    hallId: string,
-}
+    sessionId: string;
+    seatId: string;
+    userId: string;
+    hallId: string;
+};
 
 @Injectable()
 export class TicketFactory implements DomainFactory<Ticket> {
@@ -27,7 +27,7 @@ export class TicketFactory implements DomainFactory<Ticket> {
         @Inject(SESSION_REPOSITORY_TOKEN)
         private readonly sessionRepo: SessionRepository
     ) {}
-    
+
     public async create(args: TicketFactoryArgs): Promise<Ticket> {
         const { seatId, sessionId, userId, hallId } = args;
 
@@ -35,40 +35,35 @@ export class TicketFactory implements DomainFactory<Ticket> {
         if (!session) throw new NotFoundDomainException("Session doesn't exist");
 
         if (session.timePeriod.hasReservationPassed()) {
-            throw new ConflictDomainException("Booking time has passed")
+            throw new ConflictDomainException("Booking time has passed");
         }
 
         const hall = await this.hallRepo.findById(hallId);
         if (!hall) throw new NotFoundDomainException("This hall doesn't exist");
 
         const seat = hall.findSeat(seatId);
-        
+
         const seatTickets = await this.ticketRepo.findBySeat(seatId, sessionId);
-        const isReserved = seatTickets.some(item => item.status === TicketStatus.RESERVED);
+        const isReserved = seatTickets.some((item) => item.status === TicketStatus.RESERVED);
         if (isReserved) throw new ConflictDomainException("This seat is reserved");
 
         const hasNeighbour = await this.hasNeighbour(sessionId, userId, hall.seats, seat);
 
-        const ticket = new Ticket(
-            TicketStatus.RESERVED, session.basePrice, sessionId, seatId, userId
-        );
+        const ticket = new Ticket(TicketStatus.RESERVED, session.basePrice, sessionId, seatId, userId);
 
         ticket.activeDiscount(session.timePeriod.startTime, hasNeighbour);
 
         return ticket;
     }
 
-    private async hasNeighbour(
-        sessionId: string, userId: string, seats: Seat[], selectedSeat: Seat
-    ): Promise<boolean> {
+    private async hasNeighbour(sessionId: string, userId: string, seats: Seat[], selectedSeat: Seat): Promise<boolean> {
         const tickets = await this.ticketRepo.findByUser(userId, sessionId);
 
-        return tickets.some(item => {
-            const seat = seats.find(seat => seat.id === item.seatId);
+        return tickets.some((item) => {
+            const seat = seats.find((seat) => seat.id === item.seatId);
             if (!seat) return false;
 
-            return selectedSeat.row === seat.row && 
-            Math.abs(selectedSeat.column - seat.column) === 1
+            return selectedSeat.row === seat.row && Math.abs(selectedSeat.column - seat.column) === 1;
         });
     }
 }

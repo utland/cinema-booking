@@ -8,13 +8,10 @@ export class ConflictExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
 
-        response
-            .status(409)
-            .json({
-                message: exception.message,
-                statusCode: 409,
-                error: "ConflictError"
-            })
+        response.status(409).json({
+            message: exception.message,
+            statusCode: 409,
+            error: "ConflictError"
+        });
     }
-
 }

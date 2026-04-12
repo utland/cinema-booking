@@ -4,7 +4,6 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { UpdateSeatsCommand } from "./update-seats.command";
 import { HALL_REPOSITORY_TOKEN, type HallRepository } from "src/domain/hall/ports/hall.repository";
 
-
 @CommandHandler(UpdateSeatsCommand)
 export class UpdateSeatsHandler implements ICommandHandler<UpdateSeatsCommand> {
     constructor(
@@ -17,7 +16,7 @@ export class UpdateSeatsHandler implements ICommandHandler<UpdateSeatsCommand> {
         this.hallAccessService.checkOngoingSessions(hallId);
 
         const hall = await this.hallRepo.findById(hallId);
-        if (!hall) throw new NotFoundException("This hall doesn't exist"); 
+        if (!hall) throw new NotFoundException("This hall doesn't exist");
 
         hall.setSeats(seats);
 

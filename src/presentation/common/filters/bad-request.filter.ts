@@ -8,13 +8,10 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
 
-        response
-            .status(400)
-            .json({
-                message: exception.message,
-                statusCode: 400,
-                error: "BadRequestError"
-            })
+        response.status(400).json({
+            message: exception.message,
+            statusCode: 400,
+            error: "BadRequestError"
+        });
     }
-
 }

@@ -18,9 +18,6 @@ export class TicketPaidHandler implements IEventHandler<TicketPaidEvent> {
         const user = await this.userRepo.findById(userId);
         if (!user) return;
 
-        await this.notificationService.sendEmail(
-            user.email,
-            `${amount}$ has been successfully transferred.`
-        )
+        await this.notificationService.sendEmail(user.email, `${amount}$ has been successfully transferred.`);
     }
 }

@@ -7,7 +7,6 @@ import { Injectable } from "@nestjs/common";
 import { TypeOrmHallMapper } from "../mappers/typeorm-hall.mapper";
 import { TypeOrmSeat } from "../entities/typeorm-seat.entity";
 
-
 @Injectable()
 export class TypeOrmHallRepository implements HallRepository {
     constructor(
@@ -20,7 +19,7 @@ export class TypeOrmHallRepository implements HallRepository {
     ) {}
 
     public async findById(id: string): Promise<Hall | null> {
-        const hallOrm = await this.hallRepo.findOne({ where: { id }, relations: { seats: true }});
+        const hallOrm = await this.hallRepo.findOne({ where: { id }, relations: { seats: true } });
         if (!hallOrm) return null;
 
         const hallDomain = this.hallMapper.toDomain(hallOrm);
@@ -28,14 +27,14 @@ export class TypeOrmHallRepository implements HallRepository {
     }
 
     public async findAll(): Promise<Hall[]> {
-        const hallsOrm = await this.hallRepo.find({ relations: { seats: true }});
+        const hallsOrm = await this.hallRepo.find({ relations: { seats: true } });
 
-        const hallDomain = hallsOrm.map(item => this.hallMapper.toDomain(item));
+        const hallDomain = hallsOrm.map((item) => this.hallMapper.toDomain(item));
         return hallDomain;
     }
 
     public async save(hall: Hall): Promise<void> {
-        await this.dateSource.transaction(async manager => {
+        await this.dateSource.transaction(async (manager) => {
             manager.delete(TypeOrmSeat, { hallId: hall.id });
 
             const hallOrm = this.hallMapper.toOrm(hall);
@@ -48,5 +47,4 @@ export class TypeOrmHallRepository implements HallRepository {
 
         await this.hallRepo.remove(hallOrm);
     }
-    
 }

@@ -7,7 +7,7 @@ import { TypeOrmSeat } from "../entities/typeorm-seat.entity";
 @Injectable()
 export class TypeOrmHallMapper implements TypeOrmMapper<Hall, TypeOrmHall> {
     public toDomain(ormEntity: TypeOrmHall): Hall {
-        const seatsInfo: SeatInfoType[] = (ormEntity.seats ?? []).map(seat => ({
+        const seatsInfo: SeatInfoType[] = (ormEntity.seats ?? []).map((seat) => ({
             row: seat.rowNumber,
             column: seat.columnNumber,
             id: seat.id
@@ -24,14 +24,14 @@ export class TypeOrmHallMapper implements TypeOrmMapper<Hall, TypeOrmHall> {
         ormHall.name = domainEntity.name;
         ormHall.type = domainEntity.type;
 
-        ormHall.seats = domainEntity.seats.map(seat => {
+        ormHall.seats = domainEntity.seats.map((seat) => {
             const ormSeat = new TypeOrmSeat();
 
             ormSeat.id = seat.id;
             ormSeat.rowNumber = seat.row;
             ormSeat.columnNumber = seat.column;
             ormSeat.hallId = domainEntity.id;
-            
+
             return ormSeat;
         });
 

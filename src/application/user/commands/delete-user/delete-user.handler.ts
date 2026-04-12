@@ -12,7 +12,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
 
     public async execute({ userId }: DeleteUserCommand): Promise<void> {
         const user = await this.userRepo.findById(userId);
-        if (!user) throw new NotFoundException('User not found');
+        if (!user) throw new NotFoundException("User not found");
 
         await this.userRepo.delete(user);
     }

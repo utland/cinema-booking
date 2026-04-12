@@ -1,98 +1,97 @@
-import { CreateTicketApiDto } from 'src/presentation/ticket/dtos/create-ticket.dto';
-import { TestBuilder } from './config/builder.test';
-import { ITestPayload } from './config/dtos.test';
-import { EntityFactory } from './config/entity-factory.test';
-import request from 'supertest';
-import { UpdateTicketStatusApiDto } from 'src/presentation/ticket/dtos/update-ticket-status.dto';
-import { TicketStatus } from 'src/domain/ticket/models/ticket.entity';
+import { CreateTicketApiDto } from "src/presentation/ticket/dtos/create-ticket.dto";
+import { TestBuilder } from "./config/builder.test";
+import { ITestPayload } from "./config/dtos.test";
+import { EntityFactory } from "./config/entity-factory.test";
+import request from "supertest";
+import { UpdateTicketStatusApiDto } from "src/presentation/ticket/dtos/update-ticket-status.dto";
+import { TicketStatus } from "src/domain/ticket/models/ticket.entity";
 
-describe('TicketModule (e2e)', () => {
-  let builder: TestBuilder;
-  let entityFactory: EntityFactory;
-  let server: any;
+describe("TicketModule (e2e)", () => {
+    let builder: TestBuilder;
+    let entityFactory: EntityFactory;
+    let server: any;
 
-  let user: ITestPayload;
-  let sessionId: string;
-  let seatId: string;
-  let hallId: string;
+    let user: ITestPayload;
+    let sessionId: string;
+    let seatId: string;
+    let hallId: string;
 
-  beforeAll(async () => {
-    builder = await TestBuilder.create();
-    server = builder.app.getHttpServer();
-    entityFactory = new EntityFactory(builder.app, server);
+    beforeAll(async () => {
+        builder = await TestBuilder.create();
+        server = builder.app.getHttpServer();
+        entityFactory = new EntityFactory(builder.app, server);
 
-    user = await entityFactory.createUser();
-    hallId = await entityFactory.createHall();
-    const movieId = await entityFactory.createMovie();
-    
-    [ seatId ] = await entityFactory.createSeats(hallId, 1);
-    sessionId = await entityFactory.createSession({ movieId, hallId });
-  }, 15000);
+        user = await entityFactory.createUser();
+        hallId = await entityFactory.createHall();
+        const movieId = await entityFactory.createMovie();
 
-  afterAll(async () => {
-    await builder.closeApp();
-  });
+        [seatId] = await entityFactory.createSeats(hallId, 1);
+        sessionId = await entityFactory.createSession({ movieId, hallId });
+    }, 15000);
 
-  afterEach(async () => {
-    await builder.clearDb(['users', 'sessions', 'halls', 'movies', "seats"]);
-  });
-
-  describe('POST /ticket', () => {
-    it('should create a ticket', async () => {
-
-      const createTicketDto: CreateTicketApiDto = {
-        sessionId,
-        seatId,
-        hallId
-      };
-
-      const res = await request(server)
-        .post('/ticket')
-        .send(createTicketDto)
-        .set('Authorization', `Bearer ${user.token}`)
-        .expect(res => {
-          console.log(res.body);
-        })
-        .expect(201);
+    afterAll(async () => {
+        await builder.closeApp();
     });
-  });
 
-  describe('PATCH /ticket/pay/:id', () => {
-    it('should pay ticket', async () => {
-      const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
-
-      const before = performance.now()
-
-      await request(server)
-        .patch(`/ticket/pay/${ticketId}`)
-        .set('Authorization', `Bearer ${user.token}`)
-        .expect(200);
-      
-      const after = performance.now();
-
-      expect(after - before).toBeLessThan(10000);
-    }, 20000);
-  });
-
-  describe('PATCH /ticket', () => {
-    it('should cancel ticket', async () => {
-      const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
-
-      await request(server)
-        .patch(`/ticket/cancel/${ticketId}`)
-        .set('Authorization', `Bearer ${user.token}`)
-        .expect(200);
+    afterEach(async () => {
+        await builder.clearDb(["users", "sessions", "halls", "movies", "seats"]);
     });
-  });
 
-  describe('DELETE /ticket/:id', () => {
-    it('should delete a ticket', async () => {
-      const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
+    describe("POST /ticket", () => {
+        it("should create a ticket", async () => {
+            const createTicketDto: CreateTicketApiDto = {
+                sessionId,
+                seatId,
+                hallId
+            };
 
-      await request(server)
-        .delete(`/ticket/${ticketId}`)
-        .set('Authorization', `Bearer ${user.token}`)
-        .expect(200);
+            const res = await request(server)
+                .post("/ticket")
+                .send(createTicketDto)
+                .set("Authorization", `Bearer ${user.token}`)
+                .expect((res) => {
+                    console.log(res.body);
+                })
+                .expect(201);
+        });
     });
-  });
+
+    describe("PATCH /ticket/pay/:id", () => {
+        it("should pay ticket", async () => {
+            const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
+
+            const before = performance.now();
+
+            await request(server)
+                .patch(`/ticket/pay/${ticketId}`)
+                .set("Authorization", `Bearer ${user.token}`)
+                .expect(200);
+
+            const after = performance.now();
+
+            expect(after - before).toBeLessThan(10000);
+        }, 20000);
+    });
+
+    describe("PATCH /ticket", () => {
+        it("should cancel ticket", async () => {
+            const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
+
+            await request(server)
+                .patch(`/ticket/cancel/${ticketId}`)
+                .set("Authorization", `Bearer ${user.token}`)
+                .expect(200);
+        });
+    });
+
+    describe("DELETE /ticket/:id", () => {
+        it("should delete a ticket", async () => {
+            const ticketId = await entityFactory.createTicket(sessionId, seatId, user.id);
+
+            await request(server)
+                .delete(`/ticket/${ticketId}`)
+                .set("Authorization", `Bearer ${user.token}`)
+                .expect(200);
+        });
+    });
 });

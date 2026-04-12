@@ -1,6 +1,6 @@
 class TicketInfoDto {
     ticketId: string;
-    movieTitle: string
+    movieTitle: string;
     showTime: Date;
     row: number;
     column: number;

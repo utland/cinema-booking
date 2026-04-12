@@ -45,7 +45,7 @@ export class TestBuilder {
         );
 
         this.app.useGlobalInterceptors(new ClassSerializerInterceptor(new Reflector()));
-        
+
         await this._app.init();
     }
 

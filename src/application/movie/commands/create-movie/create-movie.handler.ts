@@ -11,9 +11,14 @@ export class CreateMovieHandler implements ICommandHandler<CreateMovieCommand> {
         private readonly movieRepository: MovieRepository
     ) {}
 
-    public async execute(
-        { title, duration, genre, description, rentStart, rentEnd }: CreateMovieCommand
-    ): Promise<void> {
+    public async execute({
+        title,
+        duration,
+        genre,
+        description,
+        rentStart,
+        rentEnd
+    }: CreateMovieCommand): Promise<void> {
         const movie = new Movie(title, duration, description, genre, rentStart, rentEnd);
         await this.movieRepository.save(movie);
     }

@@ -8,7 +8,7 @@ import { TicketStatus } from "src/domain/ticket/models/ticket.entity";
 export class CancelTicketHandler implements ICommandHandler<CancelTicketCommand> {
     constructor(
         @Inject(TICKET_REPOSITORY_TOKEN)
-        private readonly ticketRepo: TicketRepository,
+        private readonly ticketRepo: TicketRepository
     ) {}
 
     public async execute({ ticketId, userId }: CancelTicketCommand): Promise<void> {
@@ -17,7 +17,7 @@ export class CancelTicketHandler implements ICommandHandler<CancelTicketCommand>
 
         ticket.checkOwnerchip(userId);
         ticket.updateStatus(TicketStatus.CANCELLED);
-        
+
         await this.ticketRepo.save(ticket);
     }
 }

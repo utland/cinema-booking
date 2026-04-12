@@ -8,7 +8,7 @@ export class Seat extends LocalEntity {
     ) {
         super(id);
     }
-    
+
     public get row(): number {
         return this._row;
     }

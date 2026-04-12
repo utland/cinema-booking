@@ -4,9 +4,9 @@ import { TimePeriod } from "./time-period";
 
 export class Session extends AggregateRoot {
     private _timePeriod: TimePeriod;
-    
+
     constructor(
-        private readonly _movieId: string, 
+        private readonly _movieId: string,
         private readonly _hallId: string,
         private _basePrice: number,
         startTime: Date,
@@ -32,13 +32,13 @@ export class Session extends AggregateRoot {
 
     public checkDeleteCondition() {
         if (this._timePeriod.isInBetween()) {
-            throw new BadRequestDomainException("Session cannot be deleted, during streaming")
+            throw new BadRequestDomainException("Session cannot be deleted, during streaming");
         }
     }
 
     private checkStateToModify() {
         if (this._timePeriod.isInBetween()) {
-            throw new BadRequestDomainException("This session is closed for modification")
+            throw new BadRequestDomainException("This session is closed for modification");
         }
     }
 

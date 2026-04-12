@@ -1,11 +1,11 @@
-import { number } from "joi"
+import { number } from "joi";
 
 type SeatInSessionDto = {
     seatId: string;
     row: number;
     column: number;
     isAvailable: boolean;
-}
+};
 
 export class SessionWithHallDto {
     sessionId: string;
@@ -14,5 +14,5 @@ export class SessionWithHallDto {
     hallId: string;
     hallName: string;
     hallType: string;
-    seats: SeatInSessionDto[]
+    seats: SeatInSessionDto[];
 }

@@ -29,20 +29,20 @@ export class Movie extends AggregateRoot {
     }
 
     public changeRentDate(startDate: Date, endDate: Date): void {
-        this.checkStateToModify()
+        this.checkStateToModify();
 
         this._rentDate = new RentDate(startDate, endDate);
     }
 
     public validateDeleteOperation() {
         if (this._rentDate.isGoingNow()) {
-            throw new BadRequestDomainException("Movie cannot be deleted during streaming")
+            throw new BadRequestDomainException("Movie cannot be deleted during streaming");
         }
     }
 
     private checkStateToModify() {
         if (this._rentDate.isGoingNow()) {
-            throw new BadRequestDomainException("Movie cannot be changed during streaming")
+            throw new BadRequestDomainException("Movie cannot be changed during streaming");
         }
     }
 
@@ -65,6 +65,4 @@ export class Movie extends AggregateRoot {
     public get rentDate() {
         return this._rentDate;
     }
-
-    
 }

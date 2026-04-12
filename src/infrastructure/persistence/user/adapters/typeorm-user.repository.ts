@@ -44,7 +44,7 @@ export class TypeOrmUserRepository implements UserRepository {
 
     public async delete(user: User): Promise<void> {
         const userOrm = this.userMapper.toOrm(user);
-        
+
         await this.userRepo.remove(userOrm);
     }
 }

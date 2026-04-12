@@ -17,7 +17,7 @@ export class SessionAccurateTimeService {
     public async checkTimeSlot(hallId: string, session: Session): Promise<void> {
         const sessions = await this.sessionRepo.findByHall(hallId);
 
-        const isOccupied = sessions.some(item => {
+        const isOccupied = sessions.some((item) => {
             const { id, timePeriod } = item;
 
             if (session.id === id) return false;
@@ -35,6 +35,6 @@ export class SessionAccurateTimeService {
 
         if (!isInRange) {
             throw new ConflictException("Session's time is out from rent date");
-        } 
+        }
     }
 }

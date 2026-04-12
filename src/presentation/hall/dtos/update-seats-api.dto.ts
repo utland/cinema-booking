@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsUUID, ValidateNested } from "class-validator";
-import { SeatInfoType } from "src/domain/hall/models/hall.entity"
+import { SeatInfoType } from "src/domain/hall/models/hall.entity";
 
 class SeatInfoApi {
     @IsNotEmpty()
@@ -21,5 +21,5 @@ export class UpdateSeatsApiDto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => SeatInfoApi)
-    seats: SeatInfoApi[]
+    seats: SeatInfoApi[];
 }

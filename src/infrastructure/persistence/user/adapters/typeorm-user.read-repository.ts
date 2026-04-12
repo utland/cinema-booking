@@ -6,9 +6,7 @@ import { toUserProfileDto } from "../mapper/to-user-profile.mapper";
 
 @Injectable()
 export class TypeOrmUserReadRepository implements UserReadRepository {
-    constructor(
-        private readonly dataSource: DataSource
-    ) {}
+    constructor(private readonly dataSource: DataSource) {}
 
     public async getProfile(userId: string): Promise<UserProfileDto | null> {
         const sqlRaw = `
@@ -37,6 +35,4 @@ export class TypeOrmUserReadRepository implements UserReadRepository {
         const dto = toUserProfileDto(result);
         return dto;
     }
-    
-
 }

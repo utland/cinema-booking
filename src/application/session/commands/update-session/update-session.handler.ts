@@ -13,7 +13,7 @@ export class UpdateSessionHandler implements ICommandHandler<UpdateSessionComman
     public async execute({ sessionId, startTime, finishTime, basePrice }: UpdateSessionCommand): Promise<void> {
         const session = await this.sessionRepo.findById(sessionId);
 
-        if (!session) throw new NotFoundException('This session is not found');
+        if (!session) throw new NotFoundException("This session is not found");
 
         session.setPrice(basePrice);
         session.changeTime(startTime, finishTime);

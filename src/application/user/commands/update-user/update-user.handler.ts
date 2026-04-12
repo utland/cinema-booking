@@ -12,7 +12,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
 
     public async execute({ userId, firstName, lastName }: UpdateUserCommand): Promise<void> {
         const user = await this.userRepo.findById(userId);
-        if (!user) throw new NotFoundException('User not found');
+        if (!user) throw new NotFoundException("User not found");
 
         user.updateInfo(firstName, lastName);
 

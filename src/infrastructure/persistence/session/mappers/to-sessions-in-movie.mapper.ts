@@ -1,7 +1,7 @@
-import { SessionInMovieDto } from "src/application/session/queries/dtos/session-in-movie.dto"
+import { SessionInMovieDto } from "src/application/session/queries/dtos/session-in-movie.dto";
 
 export const toSessionsInMovieDto = (result: any): SessionInMovieDto[] => {
-    return result.map(item => {
+    return result.map((item) => {
         return {
             sessionId: item.sessionId,
             hallName: item.hallName,
@@ -10,6 +10,6 @@ export const toSessionsInMovieDto = (result: any): SessionInMovieDto[] => {
             endTime: item.endTime,
             availableSeats: Number(item.availableSeats),
             totalSeats: Number(item.totalSeats)
-        }
-    })
-}
+        };
+    });
+};

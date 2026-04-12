@@ -6,5 +6,5 @@ export const toHallEditorDto = (hall: Hall): HallEditorDto => {
         name: hall.name,
         type: hall.type,
         seats: hall.seats
-    }
-}
+    };
+};

@@ -10,15 +10,15 @@ import { TicketPaidEvent } from "./ticket-paid.event";
 
 const mockTicketRepository = {
     findById: jest.fn(),
-    save: jest.fn(),
+    save: jest.fn()
 };
 
 const mockPaymentService = {
-    createPayment: jest.fn(),
+    createPayment: jest.fn()
 };
 
 const mockEventBus: jest.Mocked<EventBus> = {
-    publish: jest.fn(),
+    publish: jest.fn()
 } as unknown as jest.Mocked<EventBus>;
 
 describe("PayTicketHandler", () => {
@@ -34,17 +34,17 @@ describe("PayTicketHandler", () => {
                 PayTicketHandler,
                 {
                     provide: TICKET_REPOSITORY_TOKEN,
-                    useValue: mockTicketRepository,
+                    useValue: mockTicketRepository
                 },
                 {
                     provide: PAYMENT_SERVICE_TOKEN,
-                    useValue: mockPaymentService,
+                    useValue: mockPaymentService
                 },
                 {
                     provide: EventBus,
-                    useValue: mockEventBus,
-                },
-            ],
+                    useValue: mockEventBus
+                }
+            ]
         }).compile();
 
         handler = module.get<PayTicketHandler>(PayTicketHandler);
@@ -56,14 +56,7 @@ describe("PayTicketHandler", () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        ticket = new Ticket(
-            TicketStatus.RESERVED,
-            100,
-            "session-1",
-            "seat-1",
-            "user-1",
-            "ticket-1"
-        );
+        ticket = new Ticket(TicketStatus.RESERVED, 100, "session-1", "seat-1", "user-1", "ticket-1");
     });
 
     it("should pay a reserved ticket successfully", async () => {
@@ -81,9 +74,9 @@ describe("PayTicketHandler", () => {
     it("should throw NotFoundException when ticket does not exist", async () => {
         mockTicketRepo.findById.mockResolvedValue(null);
 
-        await expect(
-            handler.execute(new PayTicketCommand("ticket-1", "user-1", "payment-token"))
-        ).rejects.toThrow(NotFoundException);
+        await expect(handler.execute(new PayTicketCommand("ticket-1", "user-1", "payment-token"))).rejects.toThrow(
+            NotFoundException
+        );
 
         expect(mockTicketRepo.save).not.toHaveBeenCalled();
         expect(mockPaymentSvc.createPayment).not.toHaveBeenCalled();
@@ -93,9 +86,9 @@ describe("PayTicketHandler", () => {
         mockTicketRepo.findById.mockResolvedValue(ticket);
         mockPaymentSvc.createPayment.mockResolvedValue({ status: "cancel", transactionId: "tx-1" });
 
-        await expect(
-            handler.execute(new PayTicketCommand("ticket-1", "user-1", "payment-token"))
-        ).rejects.toThrow(ConflictException);
+        await expect(handler.execute(new PayTicketCommand("ticket-1", "user-1", "payment-token"))).rejects.toThrow(
+            ConflictException
+        );
 
         expect(mockTicketRepo.save).not.toHaveBeenCalled();
     });
@@ -104,9 +97,9 @@ describe("PayTicketHandler", () => {
         mockTicketRepo.findById.mockResolvedValue(ticket);
         mockPaymentSvc.createPayment.mockResolvedValue(null);
 
-        await expect(
-            handler.execute(new PayTicketCommand("ticket-1", "user-1", "payment-token"))
-        ).rejects.toThrow(InternalServerErrorException);
+        await expect(handler.execute(new PayTicketCommand("ticket-1", "user-1", "payment-token"))).rejects.toThrow(
+            InternalServerErrorException
+        );
 
         expect(mockTicketRepo.save).not.toHaveBeenCalled();
     });

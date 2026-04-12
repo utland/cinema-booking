@@ -16,5 +16,4 @@ export class FindSessionWithHallHandler implements IQueryHandler<FindSessionWith
 
         return result;
     }
-
 }

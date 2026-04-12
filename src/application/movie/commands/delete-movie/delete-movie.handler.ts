@@ -10,14 +10,12 @@ export class DeleteMovieHandler implements ICommandHandler<DeleteMovieCommand> {
         private readonly movieRepository: MovieRepository
     ) {}
 
-    public async execute(
-        { movieId }: DeleteMovieCommand
-    ): Promise<void> {
+    public async execute({ movieId }: DeleteMovieCommand): Promise<void> {
         const movie = await this.movieRepository.findById(movieId);
-        if (!movie) throw new NotFoundException('Movie is not found');
-        
+        if (!movie) throw new NotFoundException("Movie is not found");
+
         movie.validateDeleteOperation();
-        
+
         await this.movieRepository.delete(movie);
     }
 }

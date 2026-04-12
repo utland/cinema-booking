@@ -26,56 +26,44 @@ import { StripeService } from "src/infrastructure/external-services/adapters/str
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: (configService: ConfigService<ConfigType>) => ({
-              ...configService.get('database'),
-              entities: [
-                TypeOrmUser, 
-                TypeOrmTicket, 
-                TypeOrmSession, 
-                TypeOrmMovie, 
-                TypeOrmHall, 
-                TypeOrmSeat
-              ],
-            }),
+                ...configService.get("database"),
+                entities: [TypeOrmUser, TypeOrmTicket, TypeOrmSession, TypeOrmMovie, TypeOrmHall, TypeOrmSeat]
+            })
         }),
-        
+
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: (configService: ConfigService<ConfigType>) => {
-              const jwtConfig = configService.get('jwt') as IJwtConfig;
-    
-              return {
-                secret: jwtConfig.secret,
-                signOptions: {
-                  expiresIn: jwtConfig.expiresIn as any,
-                },
-              };
-            },
-        }),
+                const jwtConfig = configService.get("jwt") as IJwtConfig;
+
+                return {
+                    secret: jwtConfig.secret,
+                    signOptions: {
+                        expiresIn: jwtConfig.expiresIn as any
+                    }
+                };
+            }
+        })
     ],
     providers: [
         {
-          provide: CREDENTIAL_SERVICE_TOKEN,
-          useClass: TokenService
+            provide: CREDENTIAL_SERVICE_TOKEN,
+            useClass: TokenService
         },
         {
-          provide: PASSWORD_SERVICE_TOKEN,
-          useClass: BcryptService
+            provide: PASSWORD_SERVICE_TOKEN,
+            useClass: BcryptService
         },
         {
-          provide: NOTIFICATION_SERVICE_TOKEN,
-          useClass: NodemailerService
+            provide: NOTIFICATION_SERVICE_TOKEN,
+            useClass: NodemailerService
         },
         {
-          provide: PAYMENT_SERVICE_TOKEN,
-          useClass: StripeService
-        },
+            provide: PAYMENT_SERVICE_TOKEN,
+            useClass: StripeService
+        }
     ],
-    exports: [
-      CREDENTIAL_SERVICE_TOKEN, 
-      PASSWORD_SERVICE_TOKEN,
-      NOTIFICATION_SERVICE_TOKEN,
-      PAYMENT_SERVICE_TOKEN
-    ]
+    exports: [CREDENTIAL_SERVICE_TOKEN, PASSWORD_SERVICE_TOKEN, NOTIFICATION_SERVICE_TOKEN, PAYMENT_SERVICE_TOKEN]
 })
 export class InfrastructureModule {}

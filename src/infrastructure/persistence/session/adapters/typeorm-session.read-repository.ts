@@ -10,10 +10,8 @@ import { toSessionWithHallDto } from "../mappers/to-session-with-hall.mapper";
 
 @Injectable()
 export class TypeOrmSessionReadRepository implements SessionReadRepository {
-    constructor(
-        private readonly dataSource: DataSource
-    ) {}
-    
+    constructor(private readonly dataSource: DataSource) {}
+
     public async findSessionsInMovie(movieId: string, sessionDate: Date): Promise<SessionInMovieDto[]> {
         const rawSql = `
         SELECT 
@@ -32,16 +30,18 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
             AND t.status != $1
         WHERE s.movie_id = $2 AND s.start_time >= $3 AND s.start_time <= $4
         GROUP BY s.id, s.start_time, s.finish_time, s.base_price, h.name
-        `
-        const sessions = await this.dataSource.query(
-            rawSql,
-            [TicketStatus.CANCELLED, movieId, startOfDay(sessionDate), endOfDay(sessionDate)]
-        )
-        
+        `;
+        const sessions = await this.dataSource.query(rawSql, [
+            TicketStatus.CANCELLED,
+            movieId,
+            startOfDay(sessionDate),
+            endOfDay(sessionDate)
+        ]);
+
         const dto = toSessionsInMovieDto(sessions);
         return dto;
     }
-    
+
     public async findSessionWithHall(sessionId: string): Promise<SessionWithHallDto> {
         const rawSql = `
         SELECT
@@ -62,11 +62,8 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
         LEFT JOIN halls h on s.hall_id = h.id
         LEFT JOIN seats se on h.id = se.hall_id
         WHERE s.id = $1
-        `
-        const sessionWithHall = await this.dataSource.query(
-            rawSql,
-            [sessionId, TicketStatus.CANCELLED]
-        )
+        `;
+        const sessionWithHall = await this.dataSource.query(rawSql, [sessionId, TicketStatus.CANCELLED]);
 
         const dto = toSessionWithHallDto(sessionWithHall);
 

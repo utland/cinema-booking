@@ -24,9 +24,7 @@ export class TimePeriod implements ValueObject {
     }
 
     public isOverlapped(start: Date, end: Date) {
-        return areIntervalsOverlapping(
-            { start: this._startTime, end: this._endTime }, { start, end }
-        );
+        return areIntervalsOverlapping({ start: this._startTime, end: this._endTime }, { start, end });
     }
 
     public isInRange(start: Date, end: Date) {

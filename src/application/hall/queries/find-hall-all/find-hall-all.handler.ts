@@ -6,7 +6,7 @@ import { HallListItemDto } from "../dtos/hall-list-item.dto";
 import { toHallListDto } from "../dtos/mappers/to-hall-list.mapper";
 
 @QueryHandler(FindHallAllQuery)
-export class FindAllHallHandler implements IQueryHandler<FindHallAllQuery>{
+export class FindAllHallHandler implements IQueryHandler<FindHallAllQuery> {
     constructor(
         @Inject(HALL_REPOSITORY_TOKEN)
         private readonly hallRepo: HallRepository
@@ -14,7 +14,7 @@ export class FindAllHallHandler implements IQueryHandler<FindHallAllQuery>{
 
     public async execute(): Promise<HallListItemDto[]> {
         const halls = await this.hallRepo.findAll();
-        
+
         const dto = toHallListDto(halls);
         return dto;
     }

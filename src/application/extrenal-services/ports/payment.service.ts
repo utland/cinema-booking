@@ -5,7 +5,7 @@ export class PaymentResultDto {
     transactionId: string;
 }
 
-export const PAYMENT_SERVICE_TOKEN = 'PaymentService';
+export const PAYMENT_SERVICE_TOKEN = "PaymentService";
 
 export interface PaymentService {
     createPayment(token: string, amount: number): Promise<PaymentResultDto | null>;

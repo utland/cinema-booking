@@ -9,13 +9,10 @@ export class ForbiddenExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
 
-        response
-            .status(403)
-            .json({
-                message: exception.message,
-                statusCode: 403,
-                error: "BadRequestError"
-            })
+        response.status(403).json({
+            message: exception.message,
+            statusCode: 403,
+            error: "BadRequestError"
+        });
     }
-
 }

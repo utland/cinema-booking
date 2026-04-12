@@ -4,9 +4,7 @@ import { CredentialService } from "src/application/extrenal-services/ports/crede
 
 @Injectable()
 export class TokenService implements CredentialService {
-    constructor (
-        private readonly jwtService: JwtService
-    ) {}
+    constructor(private readonly jwtService: JwtService) {}
 
     public async generate(payload: any, secret?: string | undefined): Promise<string> {
         const token = await this.jwtService.signAsync(payload, { secret });
@@ -17,5 +15,4 @@ export class TokenService implements CredentialService {
         const payload = await this.jwtService.verifyAsync(token, { secret });
         return payload;
     }
-
 }

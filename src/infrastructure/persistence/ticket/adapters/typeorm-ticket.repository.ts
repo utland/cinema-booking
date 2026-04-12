@@ -14,9 +14,9 @@ export class TypeOrmTicketRepository implements TicketRepository {
 
         private readonly ticketMapper: TypeOrmTicketMapper
     ) {}
-    
+
     public async findById(id: string): Promise<Ticket | null> {
-        const ticketOrm = await this.ticketRepo.findOne({ where: { id }});
+        const ticketOrm = await this.ticketRepo.findOne({ where: { id } });
         if (!ticketOrm) return null;
 
         const ticketDomain = this.ticketMapper.toDomain(ticketOrm);
@@ -26,21 +26,21 @@ export class TypeOrmTicketRepository implements TicketRepository {
     public async findBySession(...sessionIds: string[]): Promise<Ticket[]> {
         const ticketsOrm = await this.ticketRepo.find({ where: { sessionId: In(sessionIds) } });
 
-        const ticketsDomain = ticketsOrm.map(item => this.ticketMapper.toDomain(item));
+        const ticketsDomain = ticketsOrm.map((item) => this.ticketMapper.toDomain(item));
         return ticketsDomain;
     }
 
     public async findBySeat(seatId: string, sessionId: string): Promise<Ticket[]> {
-        const ticketsOrm = await this.ticketRepo.find({ where: { seatId, sessionId }});
+        const ticketsOrm = await this.ticketRepo.find({ where: { seatId, sessionId } });
 
-        const ticketsDomain = ticketsOrm.map(item => this.ticketMapper.toDomain(item));
+        const ticketsDomain = ticketsOrm.map((item) => this.ticketMapper.toDomain(item));
         return ticketsDomain;
     }
 
     public async findByUser(userId: string, sessionId: string): Promise<Ticket[]> {
-        const ticketsOrm = await this.ticketRepo.find({ where: { userId, sessionId }});
+        const ticketsOrm = await this.ticketRepo.find({ where: { userId, sessionId } });
 
-        const ticketsDomain = ticketsOrm.map(item => this.ticketMapper.toDomain(item));
+        const ticketsDomain = ticketsOrm.map((item) => this.ticketMapper.toDomain(item));
         return ticketsDomain;
     }
 
@@ -55,5 +55,4 @@ export class TypeOrmTicketRepository implements TicketRepository {
 
         await this.ticketRepo.remove(ticketOrm);
     }
-    
 }

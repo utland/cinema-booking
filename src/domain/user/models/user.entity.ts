@@ -1,8 +1,8 @@
 import { AggregateRoot } from "src/domain/common/domain-objects/aggregate-root";
 
 export enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
+    USER = "user",
+    ADMIN = "admin"
 }
 
 export class User extends AggregateRoot {
@@ -29,7 +29,7 @@ export class User extends AggregateRoot {
 
     public get login() {
         return this._login;
-    } 
+    }
 
     public get email() {
         return this._email;
@@ -37,11 +37,11 @@ export class User extends AggregateRoot {
 
     public get firstName() {
         return this._firstName;
-    } 
+    }
 
     public get lastName() {
         return this._lastName;
-    } 
+    }
 
     public get hashedPassword() {
         return this._hashedPassword;
@@ -49,5 +49,5 @@ export class User extends AggregateRoot {
 
     public get role() {
         return this._role;
-    } 
+    }
 }

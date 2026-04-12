@@ -20,7 +20,7 @@ export class TypeOrmMovieReadRepository implements MovieReadRepository {
     ) {}
 
     public async findById(id: string): Promise<MovieInfoDto | null> {
-        const movieOrm = await this.movieRepo.findOne({ where: { id }});
+        const movieOrm = await this.movieRepo.findOne({ where: { id } });
         if (!movieOrm) return null;
 
         const movieDto = toMovieInfoDto(movieOrm);
@@ -36,8 +36,8 @@ export class TypeOrmMovieReadRepository implements MovieReadRepository {
 
     public async findActive(): Promise<MovieListItemDto[]> {
         const today = new Date();
-        
-        const moviesOrm = await this.movieRepo.find({ 
+
+        const moviesOrm = await this.movieRepo.find({
             where: { rentStart: MoreThan(today) }
         });
 

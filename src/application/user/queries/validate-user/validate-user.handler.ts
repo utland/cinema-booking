@@ -4,7 +4,10 @@ import { ValidateUserQuery } from "./validate-user.query";
 import { USER_REPOSITORY_TOKEN, type UserRepository } from "src/domain/user/ports/user.repository";
 import { ValidateResponseDto } from "../dtos/validate-response.dto";
 import { PASSWORD_SERVICE_TOKEN, type PasswordService } from "src/application/extrenal-services/ports/password.service";
-import { CREDENTIAL_SERVICE_TOKEN, type CredentialService } from "src/application/extrenal-services/ports/credential.service";
+import {
+    CREDENTIAL_SERVICE_TOKEN,
+    type CredentialService
+} from "src/application/extrenal-services/ports/credential.service";
 import { Payload } from "src/application/common/models/payload.i";
 
 @QueryHandler(ValidateUserQuery)
@@ -25,7 +28,7 @@ export class ValidateUserHandler implements IQueryHandler<ValidateUserQuery, Val
         if (!user) throw new ConflictException("User is not found");
 
         const isPasswordEqual = await this.passwordService.compare(password, user.hashedPassword);
-        if (!isPasswordEqual) throw new NotAcceptableException('Password is wrong');
+        if (!isPasswordEqual) throw new NotAcceptableException("Password is wrong");
 
         const payload: Payload = { id: user.id, role: user.role };
 

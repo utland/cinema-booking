@@ -25,5 +25,5 @@ export class CreateHallApiDto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => SeatInfoApi)
-    seats: SeatInfoApi[]
+    seats: SeatInfoApi[];
 }
