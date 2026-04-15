@@ -19,6 +19,7 @@ import { TypeOrmTicketMapper } from "src/contexts/booking/infrastructure/persist
 import { TicketController } from "src/contexts/booking/presentation/ticket.controller";
 import { CatalogModule } from "./catalog.module";
 import { TypeOrmTicketRepository } from "src/contexts/booking/infrastructure/persistence/typeorm-ticket.repository";
+import { CalculateTicketPriceService } from "src/contexts/booking/domain/domain-services/calculate-ticket-price.service";
 
 const commands = [CreateTicketHandler, DeleteTicketHandler, CancelTicketHandler, PayTicketHandler];
 
@@ -33,6 +34,7 @@ const catalogAcl = [CatalogBookingMapper, { provide: CATALOG_GATEWAY, useClass: 
         BookingApi,
         TicketFactory,
         TypeOrmTicketMapper,
+        CalculateTicketPriceService,
         { provide: TICKET_REPOSITORY_TOKEN, useClass: TypeOrmTicketRepository },
         ...commands,
         ...stripeAcl,
