@@ -4,9 +4,9 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Ticket } from "../models/ticket.entity";
 import { TicketStatus } from "src/common/domain/enums/ticket-status.enum";
 import { CATALOG_GATEWAY, type CatalogBookingGateway } from "../ports/catalog-booking.port";
-import { SeatBooking } from "../models/seat-booking";
 import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
 import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
+import { CalculateTicketPriceService } from "../domain-services/calculate-ticket-price.service";
 
 type TicketFactoryArgs = {
     sessionId: string;
@@ -22,7 +22,9 @@ export class TicketFactory implements DomainFactory<Ticket> {
         private readonly ticketRepo: TicketRepository,
 
         @Inject(CATALOG_GATEWAY)
-        private readonly catalogGateway: CatalogBookingGateway
+        private readonly catalogGateway: CatalogBookingGateway,
+
+        private readonly calculatePriceService: CalculateTicketPriceService
     ) {}
 
     public async create(args: TicketFactoryArgs): Promise<Ticket> {
@@ -46,27 +48,12 @@ export class TicketFactory implements DomainFactory<Ticket> {
         const isReserved = tickets.some((item) => item.status === TicketStatus.RESERVED);
         if (isReserved) throw new ConflictDomainException("This seat is reserved");
 
-        const ticket = new Ticket(TicketStatus.RESERVED, session.price, sessionId, seatId, userId);
+        const ticketPrice = await this.calculatePriceService.calculateWithDiscount(
+            userId, session, seats, seat
+        );
 
-        const hasNeighbour = await this.hasNeighbour(sessionId, userId, seats, seat);
-        ticket.activeDiscount(session.startTime, hasNeighbour);
+        const ticket = new Ticket(TicketStatus.RESERVED, ticketPrice, sessionId, seatId, userId);
 
         return ticket;
-    }
-
-    private async hasNeighbour(
-        sessionId: string,
-        userId: string,
-        seats: SeatBooking[],
-        selectedSeat: SeatBooking
-    ): Promise<boolean> {
-        const tickets = await this.ticketRepo.findByUser(userId, sessionId);
-
-        return tickets.some((item) => {
-            const seat = seats.find((seat) => seat.id === item.seatId);
-            if (!seat) return false;
-
-            return selectedSeat.row === seat.row && Math.abs(selectedSeat.column - seat.column) === 1;
-        });
     }
 }

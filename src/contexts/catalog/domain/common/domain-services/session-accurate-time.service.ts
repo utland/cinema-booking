@@ -27,7 +27,7 @@ export class SessionAccurateTimeService {
     }
 
     public async checkRentRange(rentStart: Date, rentEnd: Date, session: Session): Promise<void> {
-        const isInRange = session.timePeriod.isInRange(rentStart, rentEnd);
+        const isInRange = session.timePeriod.isRangeInside(rentStart, rentEnd);
 
         if (!isInRange) {
             throw new ConflictException("Session's time is out from rent date");

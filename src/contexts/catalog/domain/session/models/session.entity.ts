@@ -30,14 +30,14 @@ export class Session extends AggregateRoot {
         this._timePeriod = new TimePeriod(start, finish);
     }
 
-    public checkDeleteCondition() {
-        if (this._timePeriod.isInBetween()) {
+    public checkDeleteCondition() {\
+        if (this._timePeriod.isInRange(new Date())) {
             throw new BadRequestDomainException("Session cannot be deleted, during streaming");
         }
     }
 
     private checkStateToModify() {
-        if (this._timePeriod.isInBetween()) {
+        if (this._timePeriod.isInRange(new Date())) {
             throw new BadRequestDomainException("This session is closed for modification");
         }
     }

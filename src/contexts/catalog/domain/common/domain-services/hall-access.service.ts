@@ -13,7 +13,7 @@ export class HallAccessService {
         const sessions = await this.sessionRepo.findByHall(hallId);
 
         for (const item of sessions) {
-            if (item.timePeriod.isInBetween()) {
+            if (item.timePeriod.isInRange(new Date())) {
                 throw new ConflictDomainException("There are unfinished sessions in this hall");
             }
         }

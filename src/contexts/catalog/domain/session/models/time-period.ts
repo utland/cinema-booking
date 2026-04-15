@@ -10,17 +10,18 @@ export class TimePeriod implements ValueObject {
         this.validatePoints(_startTime, _endTime);
     }
 
-    public isInBetween(): boolean {
-        const now = new Date();
-
-        return this._startTime < now && this._endTime > now;
+    public isInRange(date: Date): boolean {
+        return this._startTime < date && this._endTime > date;
     }
 
     public isOverlapped(start: Date, end: Date) {
-        return areIntervalsOverlapping({ start: this._startTime, end: this._endTime }, { start, end });
+        return areIntervalsOverlapping(
+            { start: this._startTime, end: this._endTime }, 
+            { start, end }
+        );
     }
 
-    public isInRange(start: Date, end: Date) {
+    public isRangeInside(start: Date, end: Date) {
         const range = { start, end };
         return isWithinInterval(this._startTime, range) && isWithinInterval(this._endTime, range);
     }

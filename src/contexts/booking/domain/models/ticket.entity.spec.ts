@@ -46,12 +46,4 @@ describe("Ticket", () => {
         await expect(res).rejects.toThrow(BadRequestDomainException);
         await expect(res).rejects.toThrow("Price cannot be less than 0");
     });
-
-    it("should correctly apply discount", async () => {
-        const ticket = new Ticket(TicketStatus.RESERVED, 100, "session-1", "seat-1", "user-1", "ticket-1");
-
-        ticket.activeDiscount(new Date(Date.now() + 20 * 60 * 1000), true);
-
-        expect(ticket.money.price).toBe(70);
-    });
 });

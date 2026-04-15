@@ -1,5 +1,6 @@
 export class SessionBooking {
     constructor(
+        private readonly _id: string,
         private readonly _price: number,
         private readonly _startTime: Date
     ) {}
@@ -9,6 +10,10 @@ export class SessionBooking {
         const deadLine = new Date(this._startTime.getTime() - 10 * 60 * 1000);
 
         return deadLine < now;
+    }
+
+    public get id() {
+        return this._id;
     }
 
     public get price() {

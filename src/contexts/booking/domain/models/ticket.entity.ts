@@ -36,11 +36,6 @@ export class Ticket extends AggregateRoot {
         this._money = new Money(price);
     }
 
-    public activeDiscount(startTime: Date, hasNeighbour: boolean) {
-        const money = this._money.calculateDiscount(startTime, hasNeighbour);
-        this._money = money;
-    }
-
     public checkOwnerchip(requestedUserId: string) {
         if (this._userId !== requestedUserId) {
             throw new ForbiddenDomainException("You are not the owner of this ticket");

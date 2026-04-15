@@ -35,13 +35,13 @@ export class Movie extends AggregateRoot {
     }
 
     public validateDeleteOperation() {
-        if (this._rentDate.isGoingNow()) {
+        if (this._rentDate.isInRange(new Date())) {
             throw new BadRequestDomainException("Movie cannot be deleted during streaming");
         }
     }
 
     private checkStateToModify() {
-        if (this._rentDate.isGoingNow()) {
+        if (this._rentDate.isInRange(new Date())) {
             throw new BadRequestDomainException("Movie cannot be changed during streaming");
         }
     }

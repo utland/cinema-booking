@@ -6,19 +6,13 @@ export class RentDate implements ValueObject {
         private readonly _start: Date,
         private readonly _end: Date
     ) {
-        this.validateDates(_start, _end);
-    }
-
-    private validateDates(start: Date, end: Date): void {
-        if (start >= end) {
+        if (_start >= _end) {
             throw new BadRequestDomainException("End time must be greater than start time for movie");
         }
     }
 
-    public isGoingNow(): boolean {
-        const now = new Date();
-
-        return this._end > now && this._start < now;
+    public isInRange(date: Date): boolean {
+        return this._end > date && this._start < date;
     }
 
     public get start() {

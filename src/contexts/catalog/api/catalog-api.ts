@@ -5,7 +5,6 @@ import { HallCatalogDto } from "./dto/hall-catalog.dto";
 import { SessionCatalogDto } from "./dto/session-catalog.dto";
 import { MovieCatalogDto } from "./dto/movie-catalog.dto";
 import { MOVIE_REPOSITORY_TOKEN, type MovieRepository } from "../domain/movie/ports/movie.repository";
-import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
 
 @Injectable()
 export class CatalogApi {
@@ -32,6 +31,7 @@ export class CatalogApi {
         if (!session) return null;
 
         return {
+            id: session.id,
             price: session.basePrice,
             startTime: session.timePeriod.startTime,
             finishTime: session.timePeriod.endTime
