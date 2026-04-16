@@ -12,6 +12,7 @@ export class TypeOrmSessionMapper implements EntityMapper<Session, TypeOrmSessio
             ormEntity.basePrice,
             ormEntity.startTime,
             ormEntity.finishTime,
+            ormEntity.bookingTime,
             ormEntity.id
         );
     }
@@ -25,6 +26,7 @@ export class TypeOrmSessionMapper implements EntityMapper<Session, TypeOrmSessio
         ormSession.basePrice = domainEntity.basePrice;
         ormSession.startTime = domainEntity.timePeriod.startTime;
         ormSession.finishTime = domainEntity.timePeriod.endTime;
+        ormSession.bookingTime = domainEntity.bookingTime;
 
         return ormSession;
     }

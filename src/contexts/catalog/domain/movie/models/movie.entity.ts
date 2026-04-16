@@ -20,8 +20,6 @@ export class Movie extends AggregateRoot {
     }
 
     public updateInfo(title: string, description: string, duration: number, genre: string): void {
-        this.checkStateToModify();
-
         this._title = title;
         this._description = description;
         this._duration = duration;
@@ -29,19 +27,19 @@ export class Movie extends AggregateRoot {
     }
 
     public changeRentDate(startDate: Date, endDate: Date): void {
-        this.checkStateToModify();
-
         this._rentDate = new RentDate(startDate, endDate);
     }
 
     public validateDeleteOperation() {
-        if (this._rentDate.isInRange(new Date())) {
+        const now = new Date();
+        if (this._rentDate.isInRange(now)) {
             throw new BadRequestDomainException("Movie cannot be deleted during streaming");
         }
     }
 
-    private checkStateToModify() {
-        if (this._rentDate.isInRange(new Date())) {
+    public checkStateToModify() {
+        const now = new Date();
+        if (this._rentDate.isInRange(now)) {
             throw new BadRequestDomainException("Movie cannot be changed during streaming");
         }
     }

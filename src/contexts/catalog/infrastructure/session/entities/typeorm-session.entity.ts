@@ -16,6 +16,9 @@ export class TypeOrmSession {
     @Column({ type: "decimal", name: "base_price" })
     basePrice: number;
 
+    @Column({ type: "timestamp", name: "booking_time" })
+    bookingTime: Date;
+
     @Column({ name: "movie_id" })
     movieId: string;
 

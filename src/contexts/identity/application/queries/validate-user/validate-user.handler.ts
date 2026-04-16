@@ -2,16 +2,16 @@ import { ConflictException, Inject, NotAcceptableException } from "@nestjs/commo
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { ValidateUserQuery } from "./validate-user.query";
 import { USER_REPOSITORY_TOKEN, type UserRepository } from "src/contexts/identity/domain/ports/user.repository";
-import { ValidateResponseDto } from "../dtos/validate-response.dto";
 import { Payload } from "src/common/interfaces/payload.i";
 import { PASSWORD_SERVICE_TOKEN, type PasswordService } from "src/contexts/identity/domain/ports/password.service";
 import {
     CREDENTIAL_SERVICE_TOKEN,
     type CredentialService
 } from "src/contexts/identity/domain/ports/credential.service";
+import { TokenDto } from "../dtos/token.dto";
 
 @QueryHandler(ValidateUserQuery)
-export class ValidateUserHandler implements IQueryHandler<ValidateUserQuery, ValidateResponseDto> {
+export class ValidateUserHandler implements IQueryHandler<ValidateUserQuery> {
     constructor(
         @Inject(USER_REPOSITORY_TOKEN)
         private readonly userRepo: UserRepository,
@@ -23,7 +23,7 @@ export class ValidateUserHandler implements IQueryHandler<ValidateUserQuery, Val
         private readonly credentialService: CredentialService
     ) {}
 
-    public async execute({ login, password }: ValidateUserQuery): Promise<ValidateResponseDto> {
+    public async execute({ login, password }: ValidateUserQuery): Promise<TokenDto> {
         const user = await this.userRepo.findByLogin(login);
         if (!user) throw new ConflictException("User is not found");
 

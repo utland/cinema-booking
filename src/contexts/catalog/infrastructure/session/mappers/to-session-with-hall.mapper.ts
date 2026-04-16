@@ -7,6 +7,7 @@ export const toSessionWithHallDto = (response: any[]): SessionWithHallDto => {
         sessionId: sessionData.sessionId,
         startTime: sessionData.startTime,
         endTime: sessionData.endTime,
+        bookingTime: sessionData.bookingTime,
         hallId: sessionData.hallId,
         hallName: sessionData.hallName,
         hallType: sessionData.hallType,

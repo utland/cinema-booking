@@ -8,6 +8,7 @@ export const toSessionsInMovieDto = (result: any): SessionInMovieDto[] => {
             basePrice: item.basePrice,
             startTime: item.startTime,
             endTime: item.endTime,
+            bookingTime: item.bookingTime,
             availableSeats: Number(item.availableSeats),
             totalSeats: Number(item.totalSeats)
         };

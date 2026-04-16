@@ -6,8 +6,8 @@ import { SessionCatalogDto } from "src/contexts/catalog/api/dto/session-catalog.
 
 @Injectable()
 export class CatalogBookingMapper {
-    public toSessionBooking({ price, startTime, id }: SessionCatalogDto): SessionBooking {
-        const sessionBooking = new SessionBooking(id, price, startTime);
+    public toSessionBooking({ price, startTime, id, bookingTime }: SessionCatalogDto): SessionBooking {
+        const sessionBooking = new SessionBooking(id, price, startTime, bookingTime);
         return sessionBooking;
     }
 

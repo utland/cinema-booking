@@ -34,23 +34,25 @@ describe("HallAccessService", () => {
 
     describe("checkOngoingSessions", () => {
         it("should not throw when sessions exist but none are ongoing", async () => {
-            const pastSession = new Session(
+            const session1 = new Session(
                 "movie-1",
                 "hall-1",
                 100,
                 new Date("2023-01-01T10:00:00Z"),
-                new Date("2023-01-01T12:00:00Z")
+                new Date("2023-01-01T12:00:00Z"),
+                new Date("2023-01-01T09:00:00Z")
             );
 
-            const futureSession = new Session(
+            const session2 = new Session(
                 "movie-2",
                 "hall-1",
                 150,
                 new Date("2026-12-01T10:00:00Z"),
-                new Date("2026-12-01T12:00:00Z")
+                new Date("2026-12-01T12:00:00Z"),
+                new Date("2026-12-01T09:00:00Z")
             );
 
-            mockSessionRepo.findByHall.mockResolvedValue([pastSession, futureSession]);
+            mockSessionRepo.findByHall.mockResolvedValue([session1, session2]);
 
             await expect(service.checkOngoingSessions("hall-1")).resolves.not.toThrow();
         });
@@ -60,8 +62,9 @@ describe("HallAccessService", () => {
                 "movie-1",
                 "hall-1",
                 100,
-                new Date("2026-03-29T10:00:00Z"),
-                new Date("2026-03-31T12:00:00Z")
+                new Date(Date.now() - 60 * 60 * 1000), // started 1 hour ago
+                new Date(Date.now() + 60 * 60 * 1000), // ends in 1 hour
+                new Date(Date.now() - 2 * 60 * 60 * 1000) // booked 2 hours ago
             );
 
             mockSessionRepo.findByHall.mockResolvedValue([ongoingSession]);
@@ -70,7 +73,7 @@ describe("HallAccessService", () => {
                 await service.checkOngoingSessions(ongoingSession.hallId);
             } catch (err: any) {
                 expect(err).toBeInstanceOf(ConflictDomainException);
-                expect(err.message).toBe("There are unfinished sessions in this hall");
+                expect(err.message).toBe("There are active sessions in this hall");
             }
         });
 
@@ -80,15 +83,17 @@ describe("HallAccessService", () => {
                 "hall-1",
                 100,
                 new Date("2023-01-01T10:00:00Z"),
-                new Date("2023-01-01T12:00:00Z")
+                new Date("2023-01-01T12:00:00Z"),
+                new Date("2023-01-01T09:00:00Z")
             );
 
             const ongoingSession = new Session(
-                "movie-2",
+                "movie-1",
                 "hall-1",
-                150,
-                new Date("2026-03-29T10:00:00Z"),
-                new Date("2026-03-31T12:00:00Z")
+                100,
+                new Date(Date.now() - 60 * 60 * 1000), // started 1 hour ago
+                new Date(Date.now() + 60 * 60 * 1000), // ends in 1 hour
+                new Date(Date.now() - 2 * 60 * 60 * 1000) // booked 2 hours ago
             );
 
             mockSessionRepo.findByHall.mockResolvedValue([pastSession, ongoingSession]);
@@ -97,7 +102,7 @@ describe("HallAccessService", () => {
                 await service.checkOngoingSessions(ongoingSession.hallId);
             } catch (err: any) {
                 expect(err).toBeInstanceOf(ConflictDomainException);
-                expect(err.message).toBe("There are unfinished sessions in this hall");
+                expect(err.message).toBe("There are active sessions in this hall");
             }
         });
     });

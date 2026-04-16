@@ -1,4 +1,4 @@
-import { CreateTicketApiDto } from "src/contexts/booking/presentation/dtos/create-ticket.dto";
+import { CreateTicketReqDto } from "src/contexts/booking/presentation/dtos/create-ticket.request.dto";
 import { TestBuilder } from "./config/builder.test";
 import { ITestPayload } from "./config/dtos.test";
 import { EntityFactory } from "./config/entity-factory.test";
@@ -37,7 +37,7 @@ describe("TicketModule (e2e)", () => {
 
     describe("POST /ticket", () => {
         it("should create a ticket", async () => {
-            const createTicketDto: CreateTicketApiDto = {
+            const createTicketDto: CreateTicketReqDto = {
                 sessionId,
                 seatId,
                 hallId

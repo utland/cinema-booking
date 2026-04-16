@@ -1,4 +1,4 @@
-import { UpdateMovieApiDto } from "src/contexts/catalog/presentation/movie/dtos/update-movie-api.dto";
+import { UpdateMovieReqDto } from "src/contexts/catalog/presentation/movie/dtos/request/update-movie.request.dto";
 import { TestBuilder } from "./config/builder.test";
 import { ITestPayload, movieTest, tokenName } from "./config/dtos.test";
 import { EntityFactory } from "./config/entity-factory.test";
@@ -125,13 +125,13 @@ describe("MovieModule (e2e)", () => {
         });
 
         it("should update movie", async () => {
-            const updateMovieDto: UpdateMovieApiDto = {
+            const updateMovieDto: UpdateMovieReqDto = {
                 title: "Updated Movie",
                 description: "Updated Description",
                 duration: 150,
                 genre: "Updated Genre",
-                rentStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-                rentEnd: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+                rentStart: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+                rentEnd: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
             };
 
             const movieId = await entityFactory.createMovie();

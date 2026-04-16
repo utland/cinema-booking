@@ -1,13 +1,17 @@
-import { ConflictException, Inject, Injectable } from "@nestjs/common";
+import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { SESSION_REPOSITORY_TOKEN, type SessionRepository } from "../../session/ports/session.repository";
 import { Session } from "../../session/models/session.entity";
 import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
+import { MOVIE_REPOSITORY_TOKEN, type MovieRepository } from "../../movie/ports/movie.repository";
 
 @Injectable()
 export class SessionAccurateTimeService {
     constructor(
         @Inject(SESSION_REPOSITORY_TOKEN)
-        private readonly sessionRepo: SessionRepository
+        private readonly sessionRepo: SessionRepository,
+
+        @Inject(MOVIE_REPOSITORY_TOKEN)
+        private readonly movieRepo: MovieRepository
     ) {}
 
     public async checkTimeSlot(hallId: string, session: Session): Promise<void> {
@@ -26,11 +30,15 @@ export class SessionAccurateTimeService {
         }
     }
 
-    public async checkRentRange(rentStart: Date, rentEnd: Date, session: Session): Promise<void> {
-        const isInRange = session.timePeriod.isRangeInside(rentStart, rentEnd);
+    public async checkRentRange(movieId: string, session: Session): Promise<void> {
+        const movie = await this.movieRepo.findById(movieId);
+        if (!movie) throw new NotFoundException("This movie is not found");
 
-        if (!isInRange) {
-            throw new ConflictException("Session's time is out from rent date");
-        }
+        const isInRange = session.timePeriod.isTimePeriodInside(movie.rentDate.start, movie.rentDate.end);
+        if (!isInRange) throw new ConflictException("Session's time is out from rent date");
+
+        const isBookingValid = session.bookingTime >= movie.rentDate.start;
+        if (!isBookingValid) throw new ConflictException("Booking time should be after rent date");
     }
+
 }

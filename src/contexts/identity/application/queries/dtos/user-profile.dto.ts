@@ -1,3 +1,4 @@
+
 class TicketInfoDto {
     ticketId: string;
     movieTitle: string;

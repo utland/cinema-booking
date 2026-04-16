@@ -1,4 +1,4 @@
-import { CreateUserApiDto } from "src/contexts/identity/presentation/dtos/create-user-api.dto";
+import { CreateUserApiDto } from "src/contexts/identity/presentation/dtos/request/create-user.request.dto";
 import { TestBuilder } from "./config/builder.test";
 import request from "supertest";
 

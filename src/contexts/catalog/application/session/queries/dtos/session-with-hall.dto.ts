@@ -9,6 +9,7 @@ export class SessionWithHallDto {
     sessionId: string;
     startTime: Date;
     endTime: Date;
+    bookingTime: Date;
     hallId: string;
     hallName: string;
     hallType: string;

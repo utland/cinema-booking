@@ -22,6 +22,8 @@ export class UpdateMovieHandler implements ICommandHandler<UpdateMovieCommand> {
         const movie = await this.movieRepository.findById(movieId);
         if (!movie) throw new NotFoundException("Movie is not found");
 
+        movie.checkStateToModify();
+
         movie.updateInfo(title, description, duration, genre);
         movie.changeRentDate(rentStart, rentEnd);
 

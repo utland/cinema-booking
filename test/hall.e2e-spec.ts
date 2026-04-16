@@ -2,9 +2,9 @@ import { TestBuilder } from "./config/builder.test";
 import { EntityFactory } from "./config/entity-factory.test";
 import request from "supertest";
 import { ITestPayload, tokenName } from "./config/dtos.test";
-import { CreateHallApiDto } from "src/contexts/catalog/presentation/hall/dtos/create-hall-api.dto";
+import { CreateHallReqDto } from "src/contexts/catalog/presentation/hall/dtos/request/create-hall.request.dto";
 import { HallType } from "src/contexts/catalog/domain/hall/models/hall.entity";
-import { UpdateSeatsApiDto } from "src/contexts/catalog/presentation/hall/dtos/update-seats-api.dto";
+import { UpdateSeatsReqDto } from "src/contexts/catalog/presentation/hall/dtos/request/update-seats.request.dto";
 
 describe("HallModule (e2e)", () => {
     let builder: TestBuilder;
@@ -30,7 +30,7 @@ describe("HallModule (e2e)", () => {
     });
 
     describe("POST /hall", () => {
-        const createHallDto: CreateHallApiDto = {
+        const createHallDto: CreateHallReqDto = {
             name: "Test Hall",
             seats: [
                 { row: 1, column: 1 },
@@ -128,7 +128,7 @@ describe("HallModule (e2e)", () => {
             const hallId = await entityFactory.createHall();
             await entityFactory.createSeats(hallId, 3);
 
-            const updateSeatsDto: UpdateSeatsApiDto = {
+            const updateSeatsDto: UpdateSeatsReqDto = {
                 hallId,
                 seats: [
                     { row: 1, column: 1 },

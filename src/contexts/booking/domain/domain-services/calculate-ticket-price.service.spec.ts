@@ -29,7 +29,7 @@ describe("CalculateTicketPriceService", () => {
     }
 
     function createSession(minutesFromNow: number) {
-        return new SessionBooking(sessionId, price, new Date(now.getTime() + minutesFromNow * 60 * 1000));
+        return new SessionBooking(sessionId, price, new Date(now.getTime() + minutesFromNow * 60 * 1000), new Date(now.getTime() - 60 * 60 * 1000));
     }
 
     it("returns full price when there is no neighbour and more than 30 minutes remain", async () => {

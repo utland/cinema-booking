@@ -1,15 +1,18 @@
+import { isWithinInterval } from "date-fns";
+
 export class SessionBooking {
     constructor(
         private readonly _id: string,
         private readonly _price: number,
-        private readonly _startTime: Date
+        private readonly _startTime: Date,
+        private readonly _bookingTime: Date
     ) {}
 
-    public hasReservationPassed(): boolean {
+    public isReservationAvailable(): boolean {
         const now = new Date();
         const deadLine = new Date(this._startTime.getTime() - 10 * 60 * 1000);
 
-        return deadLine < now;
+        return isWithinInterval(now, { start: this._bookingTime, end: deadLine });
     }
 
     public get id() {
@@ -22,5 +25,9 @@ export class SessionBooking {
 
     public get startTime() {
         return this._startTime;
+    }
+
+    public get bookingTime() {
+        return this._bookingTime;
     }
 }

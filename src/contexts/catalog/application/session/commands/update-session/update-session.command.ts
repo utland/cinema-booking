@@ -5,6 +5,7 @@ export class UpdateSessionCommand extends Command<void> {
         public readonly sessionId: string,
         public readonly startTime: Date,
         public readonly finishTime: Date,
+        public readonly bookingTime: Date,
         public readonly basePrice: number
     ) {
         super();

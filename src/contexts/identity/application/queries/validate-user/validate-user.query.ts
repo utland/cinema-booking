@@ -1,7 +1,7 @@
 import { Command, Query } from "@nestjs/cqrs";
-import { ValidateResponseDto } from "../dtos/validate-response.dto";
+import { TokenDto } from "../dtos/token.dto";
 
-export class ValidateUserQuery extends Query<ValidateResponseDto> {
+export class ValidateUserQuery extends Query<TokenDto> {
     constructor(
         public readonly login: string,
         public readonly password: string

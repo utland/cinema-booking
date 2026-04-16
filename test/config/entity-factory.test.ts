@@ -9,10 +9,10 @@ import { Role } from "src/common/domain/enums/user-role.enum";
 import { TypeOrmHall } from "src/contexts/catalog/infrastructure/hall/entities/typeorm-hall.entity";
 import { TypeOrmSeat } from "src/contexts/catalog/infrastructure/hall/entities/typeorm-seat.entity";
 import { TypeOrmMovie } from "src/contexts/catalog/infrastructure/movie/entities/typeorm-movie.entity";
-import { CreateMovieApiDto } from "src/contexts/catalog/presentation/movie/dtos/create-movie-api.dto";
-import { CreateSessionApiDto } from "src/contexts/catalog/presentation/session/dtos/create-session-api.dto";
 import { TypeOrmSession } from "src/contexts/catalog/infrastructure/session/entities/typeorm-session.entity";
 import { TypeOrmTicket } from "src/contexts/booking/infrastructure/persistence/typeorm-ticket.entity";
+import { CreateMovieReqDto } from "src/contexts/catalog/presentation/movie/dtos/request/create-movie.request.dto";
+import { CreateSessionReqDto } from "src/contexts/catalog/presentation/session/dtos/request/create-session.request.dto";
 
 export class EntityFactory {
     server: any;
@@ -88,14 +88,14 @@ export class EntityFactory {
         return seatsOrm.map((seat) => seat.id);
     }
 
-    public async createMovie(customMovieTest?: Partial<CreateMovieApiDto>): Promise<string> {
+    public async createMovie(customMovieTest?: Partial<CreateMovieReqDto>): Promise<string> {
         const movieRepo = this.app.get<Repository<TypeOrmMovie>>(getRepositoryToken(TypeOrmMovie));
         const { id } = await movieRepo.save({ ...movieTest, ...customMovieTest, id: randomUUID() });
 
         return id;
     }
 
-    public async createSession(customSessionTest?: Partial<CreateSessionApiDto>): Promise<string> {
+    public async createSession(customSessionTest?: Partial<CreateSessionReqDto>): Promise<string> {
         const sessionRepo = this.app.get<Repository<TypeOrmSession>>(getRepositoryToken(TypeOrmSession));
 
         const { id } = await sessionRepo.save({ ...sessionTest, ...customSessionTest, id: randomUUID() });

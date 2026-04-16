@@ -1,4 +1,4 @@
-import { Inject, NotFoundException } from "@nestjs/common";
+import { ConflictException, Inject, NotFoundException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { UpdateSessionCommand } from "./update-session.command";
 import {
@@ -13,13 +13,14 @@ export class UpdateSessionHandler implements ICommandHandler<UpdateSessionComman
         private readonly sessionRepo: SessionRepository
     ) {}
 
-    public async execute({ sessionId, startTime, finishTime, basePrice }: UpdateSessionCommand): Promise<void> {
+    public async execute({ sessionId, startTime, finishTime, basePrice, bookingTime }: UpdateSessionCommand): Promise<void> {
         const session = await this.sessionRepo.findById(sessionId);
-
         if (!session) throw new NotFoundException("This session is not found");
 
+        if (session.isActive()) throw new ConflictException("You cannot update active session");
+
         session.setPrice(basePrice);
-        session.changeTime(startTime, finishTime);
+        session.changeTime(startTime, finishTime, bookingTime);
 
         await this.sessionRepo.save(session);
     }

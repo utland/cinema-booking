@@ -33,8 +33,8 @@ export class TicketFactory implements DomainFactory<Ticket> {
         const session = await this.catalogGateway.getSession(sessionId);
 
         if (!session) throw new NotFoundDomainException("Session doesn't exist");
-        if (session.hasReservationPassed()) {
-            throw new ConflictDomainException("Booking time has passed");
+        if (!session.isReservationAvailable()) {
+            throw new ConflictDomainException("Booking is not available");
         }
 
         const seats = await this.catalogGateway.getSeats(hallId);

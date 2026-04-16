@@ -34,7 +34,8 @@ export class CatalogApi {
             id: session.id,
             price: session.basePrice,
             startTime: session.timePeriod.startTime,
-            finishTime: session.timePeriod.endTime
+            finishTime: session.timePeriod.endTime,
+            bookingTime: session.bookingTime
         };
     }
 

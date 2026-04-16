@@ -1,10 +1,10 @@
-import { CreateSessionApiDto } from "src/contexts/catalog/presentation/session/dtos/create-session-api.dto";
+import { CreateSessionReqDto } from "src/contexts/catalog/presentation/session/dtos/request/create-session.request.dto";
 import { TestBuilder } from "./config/builder.test";
 import { ITestPayload, sessionTest, tokenName } from "./config/dtos.test";
 import { EntityFactory } from "./config/entity-factory.test";
 import request from "supertest";
-import { FindSessionsByMovieApiDto } from "src/contexts/catalog/presentation/session/dtos/find-sessions-by-movie-api.dto";
-import { UpdateSessionApiDto } from "src/contexts/catalog/presentation/session/dtos/update-session-api.dto";
+import { FindSessionsByMovieReqDto } from "src/contexts/catalog/presentation/session/dtos/request/find-sessions-by-movie.request.dto";
+import { UpdateSessionReqDto } from "src/contexts/catalog/presentation/session/dtos/request/update-session.request.dto";
 
 describe("SessionModule (e2e)", () => {
     let builder: TestBuilder;
@@ -13,7 +13,7 @@ describe("SessionModule (e2e)", () => {
     let server: any;
     let hallId: string;
     let movieId: string;
-    let createSessionDto: CreateSessionApiDto;
+    let createSessionDto: CreateSessionReqDto;
 
     beforeAll(async () => {
         builder = await TestBuilder.create();
@@ -25,7 +25,10 @@ describe("SessionModule (e2e)", () => {
         tokens = await entityFactory.createUsers();
 
         hallId = await entityFactory.createHall();
-        movieId = await entityFactory.createMovie();
+        movieId = await entityFactory.createMovie({ 
+            rentStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), 
+            rentEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
+        });
 
         createSessionDto = { ...sessionTest, hallId, movieId };
     }, 20000);
@@ -87,7 +90,7 @@ describe("SessionModule (e2e)", () => {
 
     describe("GET /session", () => {
         it("should return sessions by movie", async () => {
-            const findDto: FindSessionsByMovieApiDto = {
+            const findDto: FindSessionsByMovieReqDto = {
                 movieId,
                 dateOfSession: new Date()
             };
@@ -129,10 +132,11 @@ describe("SessionModule (e2e)", () => {
     });
 
     describe("PATCH /session/:id", () => {
-        const updateSessionDto: UpdateSessionApiDto = {
+        const updateSessionDto: UpdateSessionReqDto = {
             startTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
-            finishTime: new Date(Date.now() + 4 * 60 * 60 * 1000),
-            basePrice: 100
+            finishTime: new Date(Date.now() + 3 * 60 * 60 * 1000),
+            basePrice: 100,
+            bookingTime: new Date(Date.now() + 60 * 60 * 1000)
         };
 
         it("should be available only for ADMIN", async () => {
@@ -147,7 +151,8 @@ describe("SessionModule (e2e)", () => {
                 movieId,
                 hallId,
                 startTime: new Date(Date.now() + 60 * 60 * 1000),
-                finishTime: new Date(Date.now() + 60 * 60 * 1000 + 2 * 60 * 60 * 1000)
+                finishTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
+                bookingTime: new Date(Date.now() + 30 * 60 * 1000)
             });
 
             await request(builder.app.getHttpServer())
@@ -176,7 +181,8 @@ describe("SessionModule (e2e)", () => {
                 movieId,
                 hallId,
                 startTime: new Date(Date.now() + 60 * 60 * 1000),
-                finishTime: new Date(Date.now() + 60 * 60 * 1000 + 2 * 60 * 60 * 1000)
+                finishTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
+                bookingTime: new Date(Date.now() + 30 * 60 * 1000)
             });
 
             await request(builder.app.getHttpServer())

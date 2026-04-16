@@ -17,10 +17,11 @@ import { AuthGuard } from "src/common/presentation/guards/auth.guard";
 import { RolesGuard } from "src/common/presentation/guards/role.guard";
 import { IdentityModule } from "./identity.module";
 import { stripeConfig } from "../config/stripe.config";
-import { BadRequestDomainException } from "src/common/domain/domain-exceptions/bad-request.exception";
-import { NotFoundDomainException } from "src/common/domain/domain-exceptions/not-found.exception";
-import { ForbiddenDomainException } from "src/common/domain/domain-exceptions/forbidden.exception";
-import { ConflictDomainException } from "src/common/domain/domain-exceptions/conflict.exception";
+import { CacheModule } from "@nestjs/cache-manager";
+import { BadRequestExceptionFilter } from "src/common/presentation/filters/bad-request.filter";
+import { NotFoundExceptionFilter } from "src/common/presentation/filters/not-found.filter";
+import { ForbiddenExceptionFilter } from "src/common/presentation/filters/forbidden.filter";
+import { ConflictExceptionFilter } from "src/common/presentation/filters/conflict.filter";
 
 @Global()
 @Module({
@@ -42,6 +43,8 @@ import { ConflictDomainException } from "src/common/domain/domain-exceptions/con
             })
         }),
 
+        CacheModule.register({ isGlobal: true }),
+
         IdentityModule
     ],
     providers: [
@@ -55,19 +58,19 @@ import { ConflictDomainException } from "src/common/domain/domain-exceptions/con
         },
         {
             provide: APP_FILTER,
-            useClass: BadRequestDomainException
+            useClass: BadRequestExceptionFilter
         },
         {
             provide: APP_FILTER,
-            useClass: NotFoundDomainException
+            useClass: NotFoundExceptionFilter
         },
         {
             provide: APP_FILTER,
-            useClass: ForbiddenDomainException
+            useClass: ForbiddenExceptionFilter
         },
         {
             provide: APP_FILTER,
-            useClass: ConflictDomainException
+            useClass: ConflictExceptionFilter
         },
     ]
 })

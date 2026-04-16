@@ -21,7 +21,7 @@ export class TimePeriod implements ValueObject {
         );
     }
 
-    public isRangeInside(start: Date, end: Date) {
+    public isTimePeriodInside(start: Date, end: Date) {
         const range = { start, end };
         return isWithinInterval(this._startTime, range) && isWithinInterval(this._endTime, range);
     }

@@ -19,6 +19,7 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
             s.start_time as "startTime", 
             s.finish_time as "endTime", 
             s.base_price as "basePrice",
+            s.booking_time as "bookingTime",
             h.name as "hallName", 
             COUNT(DISTINCT se.id) - COUNT(DISTINCT t.id) as "availableSeats",
             COUNT(DISTINCT se.id) as "totalSeats"
@@ -29,7 +30,7 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
             AND t.seat_id = se.id
             AND t.status != $1
         WHERE s.movie_id = $2 AND s.start_time >= $3 AND s.start_time <= $4
-        GROUP BY s.id, s.start_time, s.finish_time, s.base_price, h.name
+        GROUP BY s.id, s.start_time, s.finish_time, s.base_price, s.booking_time, h.name
         `;
         const sessions = await this.dataSource.query(rawSql, [
             TicketStatus.CANCELLED,
@@ -48,6 +49,7 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
             s.id as "sessionId",
             s.start_time as "startTime",
             s.finish_time as "endTime",
+            s.booking_time as "bookingTime",
             h.id as "hallId",
             h.name as "hallName",
             h.type as "hallType",
@@ -63,6 +65,7 @@ export class TypeOrmSessionReadRepository implements SessionReadRepository {
         LEFT JOIN seats se on h.id = se.hall_id
         WHERE s.id = $1
         `;
+        
         const sessionWithHall = await this.dataSource.query(rawSql, [sessionId, TicketStatus.CANCELLED]); 
         if (sessionWithHall.length === 0) return null;
 

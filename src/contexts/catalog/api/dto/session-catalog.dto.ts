@@ -3,4 +3,5 @@ export class SessionCatalogDto {
     price: number;
     startTime: Date;
     finishTime: Date;
+    bookingTime: Date;
 }

@@ -1,4 +1,4 @@
-import { Inject, NotFoundException } from "@nestjs/common";
+import { ConflictException, Inject, NotFoundException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { DeleteSessionCommand } from "./delete-session.command";
 import {
@@ -10,14 +10,14 @@ import {
 export class DeleteSessionHandler implements ICommandHandler<DeleteSessionCommand> {
     constructor(
         @Inject(SESSION_REPOSITORY_TOKEN)
-        private readonly sessionRepo: SessionRepository
+        private readonly sessionRepo: SessionRepository,
     ) {}
 
     public async execute({ sessionId }: DeleteSessionCommand): Promise<void> {
         const session = await this.sessionRepo.findById(sessionId);
         if (!session) throw new NotFoundException("This session is not found");
 
-        session.checkDeleteCondition();
+        if (session.isActive()) throw new ConflictException("You cannot delete active session");
 
         await this.sessionRepo.delete(session);
     }

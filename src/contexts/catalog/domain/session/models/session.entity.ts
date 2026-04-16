@@ -11,35 +11,40 @@ export class Session extends AggregateRoot {
         private _basePrice: number,
         startTime: Date,
         finishTime: Date,
+        private _bookingTime: Date,
         id?: string
     ) {
         super(id);
+
+        if (_bookingTime > startTime) {
+            throw new BadRequestDomainException("Booking time must be before session start time");
+        }
 
         this._timePeriod = new TimePeriod(startTime, finishTime);
     }
 
     public setPrice(price: number): void {
-        this.checkStateToModify();
-
         this._basePrice = price;
     }
 
-    public changeTime(start: Date, finish: Date) {
-        this.checkStateToModify();
-
+    public changeTime(start: Date, finish: Date, bookingTime: Date): void {
         this._timePeriod = new TimePeriod(start, finish);
+
+        if (bookingTime > this._timePeriod.startTime) {
+            throw new BadRequestDomainException("Booking time must be before session start time");
+        }
+
+        this._bookingTime = bookingTime;
     }
 
-    public checkDeleteCondition() {\
-        if (this._timePeriod.isInRange(new Date())) {
-            throw new BadRequestDomainException("Session cannot be deleted, during streaming");
-        }
+    public isActive(): boolean {
+        const now = new Date();
+
+        return this._timePeriod.endTime > now && this._bookingTime < now;
     }
 
-    private checkStateToModify() {
-        if (this._timePeriod.isInRange(new Date())) {
-            throw new BadRequestDomainException("This session is closed for modification");
-        }
+    public get bookingTime(): Date {
+        return this._bookingTime;
     }
 
     public get movieId(): string {

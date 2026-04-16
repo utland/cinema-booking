@@ -18,10 +18,10 @@ export class TypeOrmMovie {
     @Column()
     genre: string;
 
-    @Column({ type: "date", name: "rent_start" })
+    @Column({ type: "timestamp", name: "rent_start" })
     rentStart: Date;
 
-    @Column({ type: "date", name: "rent_end" })
+    @Column({ type: "timestamp", name: "rent_end" })
     rentEnd: Date;
 
     @OneToMany(() => TypeOrmSession, (session) => session.movie)

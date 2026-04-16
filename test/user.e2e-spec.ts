@@ -1,4 +1,4 @@
-import { UpdateUserApiDto } from "src/contexts/identity/presentation/dtos/update-user-api.dto";
+import { UpdateUserReqDto } from "src/contexts/identity/presentation/dtos/request/update-user.request.dto";
 import { TestBuilder } from "./config/builder.test";
 import { ITestPayload, tokenName } from "./config/dtos.test";
 import { EntityFactory } from "./config/entity-factory.test";
@@ -71,7 +71,7 @@ describe("UserModule (e2e)", () => {
 
     describe("PATCH /user", () => {
         it("should update current user data", async () => {
-            const updateUserDto: UpdateUserApiDto = {
+            const updateUserDto: UpdateUserReqDto = {
                 firstName: "UpdatedName",
                 lastName: "UpdatedLastName"
             };
