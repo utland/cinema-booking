@@ -48,9 +48,7 @@ export class TicketFactory implements DomainFactory<Ticket> {
         const isReserved = tickets.some((item) => item.status === TicketStatus.RESERVED);
         if (isReserved) throw new ConflictDomainException("This seat is reserved");
 
-        const ticketPrice = await this.calculatePriceService.calculateWithDiscount(
-            userId, session, seats, seat
-        );
+        const ticketPrice = await this.calculatePriceService.calculateWithDiscount(userId, session, seats, seat);
 
         const ticket = new Ticket(TicketStatus.RESERVED, ticketPrice, sessionId, seatId, userId);
 

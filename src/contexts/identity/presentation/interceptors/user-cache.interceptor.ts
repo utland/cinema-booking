@@ -1,5 +1,5 @@
 import { CacheInterceptor } from "@nestjs/cache-manager";
-import { ExecutionContext, CallHandler } from "@nestjs/common";
+import { ExecutionContext } from "@nestjs/common";
 import { Payload } from "src/common/interfaces/payload.i";
 
 export class UserCacheInterceptor extends CacheInterceptor {

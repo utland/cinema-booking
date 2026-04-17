@@ -30,7 +30,7 @@ describe("SessionAccurateTimeService", () => {
                 {
                     provide: MOVIE_REPOSITORY_TOKEN,
                     useValue: mockMovieRepository
-                },
+                }
             ]
         }).compile();
 
@@ -117,7 +117,15 @@ describe("SessionAccurateTimeService", () => {
 
     describe("checkRentRange", () => {
         beforeEach(() => {
-            const movie = new Movie("test", 120, "desc", "genre", new Date("2026-06-01T00:00:00Z"), new Date("2026-06-10T23:59:59Z"), "movie-1");
+            const movie = new Movie(
+                "test",
+                120,
+                "desc",
+                "genre",
+                new Date("2026-06-01T00:00:00Z"),
+                new Date("2026-06-10T23:59:59Z"),
+                "movie-1"
+            );
             mockMovieRepo.findById.mockResolvedValue(movie);
         });
 

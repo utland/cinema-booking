@@ -22,14 +22,19 @@ describe("CalculateTicketPriceService", () => {
 
     function createService(tickets: Ticket[]) {
         const ticketRepo = {
-            findByUser: jest.fn().mockResolvedValue(tickets),
+            findByUser: jest.fn().mockResolvedValue(tickets)
         } as unknown as TicketRepository;
 
         return new CalculateTicketPriceService(ticketRepo);
     }
 
     function createSession(minutesFromNow: number) {
-        return new SessionBooking(sessionId, price, new Date(now.getTime() + minutesFromNow * 60 * 1000), new Date(now.getTime() - 60 * 60 * 1000));
+        return new SessionBooking(
+            sessionId,
+            price,
+            new Date(now.getTime() + minutesFromNow * 60 * 1000),
+            new Date(now.getTime() - 60 * 60 * 1000)
+        );
     }
 
     it("returns full price when there is no neighbour and more than 30 minutes remain", async () => {
@@ -48,10 +53,7 @@ describe("CalculateTicketPriceService", () => {
         const existingTicket = new Ticket(TicketStatus.RESERVED, price, sessionId, "seat-2", userId);
         const service = createService([existingTicket]);
         const session = createSession(60);
-        const seats = [
-            new SeatBooking("seat-1", 1, 1),
-            new SeatBooking("seat-2", 1, 2),
-        ];
+        const seats = [new SeatBooking("seat-1", 1, 1), new SeatBooking("seat-2", 1, 2)];
         const selected = seats[0];
 
         const result = await service.calculateWithDiscount(userId, session, seats, selected);
@@ -74,10 +76,7 @@ describe("CalculateTicketPriceService", () => {
         const existingTicket = new Ticket(TicketStatus.RESERVED, price, sessionId, "seat-2", userId);
         const service = createService([existingTicket]);
         const session = createSession(20);
-        const seats = [
-            new SeatBooking("seat-1", 1, 1),
-            new SeatBooking("seat-2", 1, 2),
-        ];
+        const seats = [new SeatBooking("seat-1", 1, 1), new SeatBooking("seat-2", 1, 2)];
         const selected = seats[0];
 
         const result = await service.calculateWithDiscount(userId, session, seats, selected);

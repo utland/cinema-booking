@@ -46,7 +46,11 @@ describe("Session", () => {
                 new Date("2026-03-31T7:00:00Z")
             );
 
-            session.changeTime(new Date("2026-04-01T12:00:00Z"), new Date("2026-04-01T10:00:00Z"), new Date("2026-04-01T9:00:00Z"));
+            session.changeTime(
+                new Date("2026-04-01T12:00:00Z"),
+                new Date("2026-04-01T10:00:00Z"),
+                new Date("2026-04-01T9:00:00Z")
+            );
         } catch (err: any) {
             expect(err).toBeInstanceOf(BadRequestDomainException);
             expect(err.message).toBe("End time must be greater than start time for session");
@@ -64,7 +68,11 @@ describe("Session", () => {
                 new Date(Date.now() - 2 * 60 * 60)
             );
 
-            session.changeTime(new Date(Date.now() - 60 * 60), new Date(Date.now() + 60 * 60), new Date(Date.now() + 60 * 60));
+            session.changeTime(
+                new Date(Date.now() - 60 * 60),
+                new Date(Date.now() + 60 * 60),
+                new Date(Date.now() + 60 * 60)
+            );
         } catch (err: any) {
             expect(err).toBeInstanceOf(BadRequestDomainException);
             expect(err.message).toBe("Booking time must be before session start time");
@@ -83,7 +91,7 @@ describe("Session", () => {
 
         expect(session.isActive()).toBe(true);
     });
-    
+
     it("should return correct value in when session is not active", () => {
         const session = new Session(
             "movie-1",
@@ -98,19 +106,10 @@ describe("Session", () => {
     });
 
     it("should return correct value in time-period function", () => {
-        const time = new TimePeriod(
-            new Date(Date.now()), 
-            new Date(Date.now() + 2 * 60 * 60)
-        );
+        const time = new TimePeriod(new Date(Date.now()), new Date(Date.now() + 2 * 60 * 60));
 
         expect(time.isInRange(new Date(Date.now() + 60 * 60))).toBe(true);
-        expect(time.isOverlapped(
-            new Date(Date.now() - 60 * 60),
-            new Date(Date.now() + 60 * 60)
-        )).toBe(true);
-        expect(time.isTimePeriodInside(
-            new Date(Date.now() - 60 * 60),
-            new Date(Date.now() + 3 * 60 * 60)
-        )).toBe(true);
+        expect(time.isOverlapped(new Date(Date.now() - 60 * 60), new Date(Date.now() + 60 * 60))).toBe(true);
+        expect(time.isTimePeriodInside(new Date(Date.now() - 60 * 60), new Date(Date.now() + 3 * 60 * 60))).toBe(true);
     });
 });

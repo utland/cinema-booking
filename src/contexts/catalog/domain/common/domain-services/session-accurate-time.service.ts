@@ -40,5 +40,4 @@ export class SessionAccurateTimeService {
         const isBookingValid = session.bookingTime >= movie.rentDate.start;
         if (!isBookingValid) throw new ConflictException("Booking time should be after rent date");
     }
-
 }

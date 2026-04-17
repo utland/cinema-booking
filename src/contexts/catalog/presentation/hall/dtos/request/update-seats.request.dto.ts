@@ -15,7 +15,10 @@ class SeatInfoReq {
 }
 
 export class UpdateSeatsReqDto {
-    @ApiProperty({ example: "f2c9bfa5-70e9-4bf8-9ff3-4b311abad4b0", description: "Identifier of the hall to update seats for" })
+    @ApiProperty({
+        example: "f2c9bfa5-70e9-4bf8-9ff3-4b311abad4b0",
+        description: "Identifier of the hall to update seats for"
+    })
     @IsNotEmpty()
     @IsUUID()
     hallId: string;

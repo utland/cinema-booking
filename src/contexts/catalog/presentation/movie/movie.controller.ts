@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, UseInterceptors } from "@nestjs/common";
 import { CreateMovieReqDto } from "./dtos/request/create-movie.request.dto";
 import { UpdateMovieReqDto } from "./dtos/request/update-movie.request.dto";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
@@ -10,22 +10,12 @@ import { FindMovieByIdQuery } from "../../application/movie/queries/find-movie-b
 import { UpdateMovieCommand } from "../../application/movie/commands/update-movie/update-movie.command";
 import { DeleteMovieCommand } from "../../application/movie/commands/delete-movie/delete-movie.command";
 import { Role } from "src/common/domain/enums/user-role.enum";
-import {
-    ApiBearerAuth,
-    ApiTags,
-    ApiOperation,
-    ApiCreatedResponse,
-    ApiOkResponse,
-    ApiBadRequestResponse,
-    ApiNotFoundResponse,
-    ApiForbiddenResponse,
-    ApiUnauthorizedResponse,
-} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiOkResponse } from "@nestjs/swagger";
 import { FindMoviesItemResDto } from "./dtos/response/find-movies-item.response.dto";
 import { FindMovieResDto } from "./dtos/response/find-movie.response.dto";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
-@ApiUnauthorizedResponse({ description: "Authentication credentials were missing or invalid" })
-@ApiTags("Movie")
+@ApiBearerAuth()
 @Controller("movie")
 export class MovieController {
     constructor(
@@ -35,11 +25,7 @@ export class MovieController {
 
     @Post()
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
     @ApiOperation({ summary: "Create a new movie" })
-    @ApiCreatedResponse({ description: "Movie created successfully" })
-    @ApiBadRequestResponse({ description: "Invalid movie data or rent dates" })
-    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     public async create(@Body() createMovieDto: CreateMovieReqDto): Promise<void> {
         const { title, duration, description, genre, rentStart, rentEnd } = createMovieDto;
 
@@ -48,7 +34,7 @@ export class MovieController {
 
     @Get("/all")
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
+    @UseInterceptors(CacheInterceptor)
     @ApiOperation({ summary: "Get all movies" })
     @ApiOkResponse({ type: [FindMoviesItemResDto], description: "List of all movies" })
     public async findAll(): Promise<FindMoviesItemResDto[]> {
@@ -67,21 +53,18 @@ export class MovieController {
     @Get("/:id")
     @ApiOperation({ summary: "Get a movie by ID" })
     @ApiOkResponse({ type: FindMovieResDto, description: "Movie details" })
-    @ApiNotFoundResponse({ description: "Movie not found" })
     public async findOne(@Param("id", new ParseUUIDPipe()) movieId: string): Promise<FindMovieResDto> {
-        const result =  await this.queryBus.execute(new FindMovieByIdQuery(movieId));
+        const result = await this.queryBus.execute(new FindMovieByIdQuery(movieId));
         return result;
     }
 
     @Patch("/:id")
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
     @ApiOperation({ summary: "Update an existing movie" })
-    @ApiOkResponse({ description: "Movie updated successfully" })
-    @ApiNotFoundResponse({ description: "Movie not found" })
-    @ApiBadRequestResponse({ description: "Invalid movie update data" })
-    @ApiForbiddenResponse({ description: "Insufficient permissions" })
-    public async update(@Param("id", new ParseUUIDPipe()) movieId: string, @Body() updateMovieDto: UpdateMovieReqDto): Promise<void> {
+    public async update(
+        @Param("id", new ParseUUIDPipe()) movieId: string,
+        @Body() updateMovieDto: UpdateMovieReqDto
+    ): Promise<void> {
         const { title, description, duration, genre, rentEnd, rentStart } = updateMovieDto;
 
         await this.commandBus.execute(
@@ -91,12 +74,7 @@ export class MovieController {
 
     @Delete("/:id")
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
     @ApiOperation({ summary: "Delete a movie" })
-    @ApiOkResponse({ description: "Movie deleted successfully" })
-    @ApiNotFoundResponse({ description: "Movie not found" })
-    @ApiBadRequestResponse({ description: "Movie cannot be deleted during streaming" })
-    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     public async remove(@Param("id", new ParseUUIDPipe()) movieId: string): Promise<void> {
         await this.commandBus.execute(new DeleteMovieCommand(movieId));
     }

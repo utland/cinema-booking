@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, Param, Delete, Post, ParseUUIDPipe } from "@nestjs/common";
+import { Controller, Get, Body, Patch, Param, Delete, Post, ParseUUIDPipe, UseInterceptors } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Public } from "src/common/presentation/decorators/public.decorator";
 import { CreateUserReqDto } from "./dtos/request/create-user.request.dto";
@@ -25,10 +25,11 @@ import {
     ApiNotFoundResponse,
     ApiConflictResponse,
     ApiNotAcceptableResponse,
-    ApiForbiddenResponse,
+    ApiForbiddenResponse
 } from "@nestjs/swagger";
 import { ValidateUserResDto } from "./dtos/response/sign-in.response.dto";
 import { FindByIdResDto } from "./dtos/response/find-by-id.response.dto";
+import { UserCacheInterceptor } from "./interceptors/user-cache.interceptor";
 
 @ApiTags("Identity")
 @Controller("user")
@@ -41,9 +42,6 @@ export class UserController {
     @Public()
     @Post("/sign-up")
     @ApiOperation({ summary: "Register a new user" })
-    @ApiCreatedResponse({ description: "User registered successfully" })
-    @ApiConflictResponse({ description: "Login/email already exists" })
-    @ApiBadRequestResponse({ description: "Invalid registration data" })
     public async signUp(@Body() createUserDto: CreateUserReqDto): Promise<void> {
         const { email, password, login, firstName, lastName } = createUserDto;
         await this.commandBus.execute(new CreateUserCommand(email, password, login, firstName, lastName));
@@ -53,22 +51,18 @@ export class UserController {
     @Post("/sign-in")
     @ApiOperation({ summary: "Authenticate a user" })
     @ApiOkResponse({ type: ValidateUserResDto, description: "User authenticated successfully" })
-    @ApiNotFoundResponse({ description: "User not found" })
-    @ApiNotAcceptableResponse({ description: "Incorrect password" })
-    @ApiBadRequestResponse({ description: "Invalid login or password" })
     public async signIn(@Body() validateUserDto: ValidateUserReqDto): Promise<ValidateUserResDto> {
         const { login, password } = validateUserDto;
 
         const result = await this.queryBus.execute(new ValidateUserQuery(login, password));
-        return result
+        return result;
     }
 
     @Get()
+    @UseInterceptors(UserCacheInterceptor)
     @ApiBearerAuth()
     @ApiOperation({ summary: "Get the authenticated user's profile" })
     @ApiOkResponse({ type: FindByIdResDto, description: "Current user profile" })
-    @ApiNotFoundResponse({ description: "User not found" })
-    @ApiUnauthorizedResponse({ description: "Authentication credentials were missing or invalid" })
     public async findById(@CurrentUser() user: Payload): Promise<FindByIdResDto> {
         const result = await this.queryBus.execute(new FindUserByIdQuery(user.id));
         return result;
@@ -77,10 +71,6 @@ export class UserController {
     @Patch()
     @ApiBearerAuth()
     @ApiOperation({ summary: "Update the authenticated user's profile" })
-    @ApiOkResponse({ description: "User profile updated successfully" })
-    @ApiNotFoundResponse({ description: "User not found" })
-    @ApiBadRequestResponse({ description: "Invalid registration data" })
-    @ApiUnauthorizedResponse({ description: "Authentication credentials were missing or invalid" })
     public async update(@CurrentUser() user: Payload, @Body() updateUserDto: UpdateUserReqDto): Promise<void> {
         const { firstName, lastName } = updateUserDto;
 
@@ -91,11 +81,6 @@ export class UserController {
     @Roles(Role.ADMIN)
     @ApiBearerAuth()
     @ApiOperation({ summary: "Delete a user by ID" })
-    @ApiOkResponse({ description: "User deleted successfully" })
-    @ApiNotFoundResponse({ description: "User not found" })
-    @ApiBadRequestResponse({ description: "Invalid registration data" })
-    @ApiUnauthorizedResponse({ description: "Authentication credentials were missing or invalid" })
-    @ApiForbiddenResponse({ description: "You do not have permission to perform this action" })
     public async remove(@Param("id", new ParseUUIDPipe()) userId: string): Promise<void> {
         await this.commandBus.execute(new DeleteUserCommand(userId));
     }

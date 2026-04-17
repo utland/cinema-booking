@@ -11,9 +11,9 @@ async function bootstrap() {
         .setDescription("API for booking cinema tickets")
         .setVersion("1.0")
         .build();
-    
+
     const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('api', app, document);
+    SwaggerModule.setup("api", app, document);
 
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
     app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));

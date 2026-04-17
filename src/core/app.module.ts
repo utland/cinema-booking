@@ -6,6 +6,6 @@ import { IdentityModule } from "./modules/identity.module";
 import { NotificationsModule } from "./modules/notifications.module";
 
 @Module({
-    imports: [CommonModule, CatalogModule, BookingModule, IdentityModule, NotificationsModule],
+    imports: [CommonModule, CatalogModule, BookingModule, IdentityModule, NotificationsModule]
 })
 export class AppModule {}

@@ -7,13 +7,28 @@ export class FindSessionItemByMovieResDto {
     @ApiProperty({ example: "Main Hall", description: "Name of the hall where the session occurs" })
     hallName: string;
 
-    @ApiProperty({ example: "2026-06-10T14:00:00.000Z", type: String, format: "date-time", description: "Session start time" })
+    @ApiProperty({
+        example: "2026-06-10T14:00:00.000Z",
+        type: String,
+        format: "date-time",
+        description: "Session start time"
+    })
     startTime: Date;
 
-    @ApiProperty({ example: "2026-06-10T16:30:00.000Z", type: String, format: "date-time", description: "Session end time" })
+    @ApiProperty({
+        example: "2026-06-10T16:30:00.000Z",
+        type: String,
+        format: "date-time",
+        description: "Session end time"
+    })
     endTime: Date;
 
-    @ApiProperty({ example: "2026-06-09T14:00:00.000Z", type: String, format: "date-time", description: "Deadline for booking tickets for this session" })
+    @ApiProperty({
+        example: "2026-06-09T14:00:00.000Z",
+        type: String,
+        format: "date-time",
+        description: "Deadline for booking tickets for this session"
+    })
     bookingTime: Date;
 
     @ApiProperty({ example: 250, description: "Base ticket price for the session" })

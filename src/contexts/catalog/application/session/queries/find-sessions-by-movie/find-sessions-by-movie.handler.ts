@@ -13,7 +13,6 @@ export class FindSessionsByMovieHandler implements IQueryHandler<FindSessionsByM
 
     async execute({ movieId, dateOfSession }: FindSessionsByMovieQuery): Promise<SessionInMovieDto[]> {
         const result = await this.sessionReadRepository.findSessionsInMovie(movieId, dateOfSession);
-
         return result;
     }
 }

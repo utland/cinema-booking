@@ -88,10 +88,7 @@ describe("SessionFactory", () => {
 
             expect(mockHallRepo.findById).toHaveBeenCalledWith("hall-1");
             expect(mockTimeService.checkTimeSlot).toHaveBeenCalledWith("hall-1", expect.any(Session));
-            expect(mockTimeService.checkRentRange).toHaveBeenCalledWith(
-                "movie-1",
-                expect.any(Session)
-            );
+            expect(mockTimeService.checkRentRange).toHaveBeenCalledWith("movie-1", expect.any(Session));
         });
 
         it("should throw NotFoundDomainException when hall does not exist", async () => {

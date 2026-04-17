@@ -70,13 +70,18 @@ describe("MovieModule (e2e)", () => {
     describe("GET /movie", () => {
         it("should return movies by rent date", async () => {
             await entityFactory.createMovie({
-                rentStart: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-                rentEnd: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000)
+                rentStart: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
+                rentEnd: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000)
             });
 
             await entityFactory.createMovie({
                 rentStart: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
                 rentEnd: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+            });
+
+            await entityFactory.createMovie({
+                rentStart: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+                rentEnd: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)
             });
 
             const res = await request(server)
@@ -85,7 +90,7 @@ describe("MovieModule (e2e)", () => {
                 .expect(200);
 
             expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBe(1);
+            expect(res.body.length).toBe(2);
         });
     });
 

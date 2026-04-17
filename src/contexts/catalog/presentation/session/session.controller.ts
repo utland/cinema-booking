@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from "@nestjs/common";
 import { CreateSessionReqDto } from "./dtos/request/create-session.request.dto";
 import { FindSessionsByMovieReqDto } from "./dtos/request/find-sessions-by-movie.request.dto";
 import { UpdateSessionReqDto } from "./dtos/request/update-session.request.dto";
@@ -10,23 +10,11 @@ import { FindSessionWithHallQuery } from "../../application/session/queries/find
 import { UpdateSessionCommand } from "../../application/session/commands/update-session/update-session.command";
 import { DeleteSessionCommand } from "../../application/session/commands/delete-session/delete-session.command";
 import { Role } from "src/common/domain/enums/user-role.enum";
-import {
-    ApiBearerAuth,
-    ApiTags,
-    ApiOperation,
-    ApiCreatedResponse,
-    ApiOkResponse,
-    ApiBadRequestResponse,
-    ApiNotFoundResponse,
-    ApiConflictResponse,
-    ApiForbiddenResponse,
-    ApiUnauthorizedResponse,
-} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiOkResponse } from "@nestjs/swagger";
 import { FindSessionResDto } from "./dtos/response/find-session.response.dto";
 import { FindSessionItemByMovieResDto } from "./dtos/response/find-session-item.response.dto";
 
-@ApiTags("Session")
-@ApiUnauthorizedResponse({ description: "Authentication credentials were missing or invalid" })
+@ApiBearerAuth()
 @Controller("session")
 export class SessionController {
     constructor(
@@ -36,12 +24,7 @@ export class SessionController {
 
     @Post()
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
     @ApiOperation({ summary: "Create a new session" })
-    @ApiCreatedResponse({ description: "Session created successfully" })
-    @ApiBadRequestResponse({ description: "Invalid session data" })
-    @ApiConflictResponse({ description: "Session time or hall conflicts with existing schedule" })
-    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     public async create(@Body() createSessionDto: CreateSessionReqDto): Promise<void> {
         const { startTime, finishTime, basePrice, movieId, hallId, bookingTime } = createSessionDto;
         await this.commandBus.execute(
@@ -52,8 +35,9 @@ export class SessionController {
     @Get()
     @ApiOperation({ summary: "Find sessions by movie and date" })
     @ApiOkResponse({ type: [FindSessionItemByMovieResDto], description: "List of sessions for a movie" })
-    @ApiBadRequestResponse({ description: "Invalid query parameters" })
-    public async findByMovie(@Body() findSessionByMovieDto: FindSessionsByMovieReqDto): Promise<FindSessionItemByMovieResDto[]> {
+    public async findByMovie(
+        @Query() findSessionByMovieDto: FindSessionsByMovieReqDto
+    ): Promise<FindSessionItemByMovieResDto[]> {
         const { movieId, dateOfSession } = findSessionByMovieDto;
 
         const result = await this.queryBus.execute(new FindSessionsByMovieQuery(movieId, dateOfSession));
@@ -63,7 +47,6 @@ export class SessionController {
     @Get("/:id")
     @ApiOperation({ summary: "Get a session by ID" })
     @ApiOkResponse({ type: FindSessionResDto, description: "Session details with hall info" })
-    @ApiNotFoundResponse({ description: "Session not found" })
     public async findById(@Param("id", new ParseUUIDPipe()) sessionId: string): Promise<FindSessionResDto> {
         const result = await this.queryBus.execute(new FindSessionWithHallQuery(sessionId));
         return result;
@@ -71,30 +54,21 @@ export class SessionController {
 
     @Patch("/:id")
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
     @ApiOperation({ summary: "Update an existing session" })
-    @ApiOkResponse({ description: "Session updated successfully" })
-    @ApiNotFoundResponse({ description: "Session not found" })
-    @ApiBadRequestResponse({ description: "Invalid session update data" })
-    @ApiConflictResponse({ description: "Session cannot be updated due to scheduling or streaming constraints" })
-    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     public async update(
         @Param("id", new ParseUUIDPipe()) sessionId: string,
         @Body() updateSessionDto: UpdateSessionReqDto
     ): Promise<void> {
         const { startTime, finishTime, basePrice, bookingTime } = updateSessionDto;
 
-        await this.commandBus.execute(new UpdateSessionCommand(sessionId, startTime, finishTime, bookingTime, basePrice));
+        await this.commandBus.execute(
+            new UpdateSessionCommand(sessionId, startTime, finishTime, bookingTime, basePrice)
+        );
     }
 
     @Delete("/:id")
     @Roles(Role.ADMIN)
-    @ApiBearerAuth()
     @ApiOperation({ summary: "Delete a session" })
-    @ApiOkResponse({ description: "Session deleted successfully" })
-    @ApiNotFoundResponse({ description: "Session not found" })
-    @ApiBadRequestResponse({ description: "Session cannot be deleted during streaming" })
-    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     public async remove(@Param("id", new ParseUUIDPipe()) sessionId: string): Promise<void> {
         await this.commandBus.execute(new DeleteSessionCommand(sessionId));
     }

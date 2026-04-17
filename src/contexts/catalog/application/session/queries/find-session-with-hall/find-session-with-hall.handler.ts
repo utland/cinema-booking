@@ -13,7 +13,7 @@ export class FindSessionWithHallHandler implements IQueryHandler<FindSessionWith
 
     async execute({ sessionId }: FindSessionWithHallQuery): Promise<SessionWithHallDto> {
         const result = await this.sessionReadRepository.findSessionWithHall(sessionId);
-        if (!result) throw new NotFoundException("This sessions doesn't exist")
+        if (!result) throw new NotFoundException("This sessions doesn't exist");
 
         return result;
     }

@@ -8,35 +8,31 @@ import { differenceInMinutes } from "date-fns";
 export class CalculateTicketPriceService {
     constructor(
         @Inject(TICKET_REPOSITORY_TOKEN)
-        private readonly ticketRepo: TicketRepository,
+        private readonly ticketRepo: TicketRepository
     ) {}
 
     public async calculateWithDiscount(
-        userId: string, 
-        session: SessionBooking, 
-        seats: SeatBooking[], 
+        userId: string,
+        session: SessionBooking,
+        seats: SeatBooking[],
         selected: SeatBooking
     ): Promise<number> {
         const userTickets = await this.ticketRepo.findByUser(userId, session.id);
         const hasNeighbour = this.hasNeighbour(userTickets, seats, selected);
-        
-        let discount = 1; 
+
+        let discount = 1;
 
         if (hasNeighbour) discount -= 0.1;
-        
+
         const now = new Date();
         const minutesToStart = differenceInMinutes(session.startTime, now);
-        
+
         if (minutesToStart < 30 && minutesToStart > 0) discount -= 0.2;
-        
+
         return session.price * discount;
     }
 
-    private hasNeighbour(
-        userTickets: Ticket[],
-        seats: SeatBooking[],
-        selectedSeat: SeatBooking
-    ): boolean {
+    private hasNeighbour(userTickets: Ticket[], seats: SeatBooking[], selectedSeat: SeatBooking): boolean {
         return userTickets.some((item) => {
             const seat = seats.find((seat) => seat.id === item.seatId);
             if (!seat) return false;

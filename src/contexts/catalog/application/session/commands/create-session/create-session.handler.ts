@@ -16,10 +16,22 @@ export class CreateSessionHandler implements ICommandHandler<CreateSessionComman
         private readonly sessionFactory: SessionFactory
     ) {}
 
-    public async execute({ startTime, finishTime, basePrice, movieId, hallId, bookingTime }: CreateSessionCommand): Promise<void> {
-        const session = await this.sessionFactory.create(
-            { movieId, hallId, basePrice, startTime, endTime: finishTime, bookingTime }
-        );
+    public async execute({
+        startTime,
+        finishTime,
+        basePrice,
+        movieId,
+        hallId,
+        bookingTime
+    }: CreateSessionCommand): Promise<void> {
+        const session = await this.sessionFactory.create({
+            movieId,
+            hallId,
+            basePrice,
+            startTime,
+            endTime: finishTime,
+            bookingTime
+        });
 
         await this.sessionRepo.save(session);
     }

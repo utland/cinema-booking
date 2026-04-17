@@ -71,7 +71,7 @@ import { ConflictExceptionFilter } from "src/common/presentation/filters/conflic
         {
             provide: APP_FILTER,
             useClass: ConflictExceptionFilter
-        },
+        }
     ]
 })
 export class CommonModule {}

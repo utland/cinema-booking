@@ -25,9 +25,9 @@ describe("SessionModule (e2e)", () => {
         tokens = await entityFactory.createUsers();
 
         hallId = await entityFactory.createHall();
-        movieId = await entityFactory.createMovie({ 
-            rentStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), 
-            rentEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
+        movieId = await entityFactory.createMovie({
+            rentStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            rentEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         });
 
         createSessionDto = { ...sessionTest, hallId, movieId };
@@ -115,9 +115,8 @@ describe("SessionModule (e2e)", () => {
             await entityFactory.createTicket(sessionId, seatId3, tokens.get("user")!.id);
 
             const res = await request(server)
-                .get("/session")
+                .get(`/session?movieId=${findDto.movieId}&dateOfSession=${findDto.dateOfSession.toISOString()}`)
                 .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
-                .send(findDto)
                 .expect(200);
 
             expect(Array.isArray(res.body)).toBe(true);
@@ -162,9 +161,9 @@ describe("SessionModule (e2e)", () => {
                 .expect(200);
 
             await request(builder.app.getHttpServer())
-              .get(`/session/${sessionId}`)
-              .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-              .expect(200);
+                .get(`/session/${sessionId}`)
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .expect(200);
         });
     });
 
@@ -191,9 +190,9 @@ describe("SessionModule (e2e)", () => {
                 .expect(200);
 
             await request(builder.app.getHttpServer())
-              .get(`/session/${sessionId}`)
-              .set('Authorization', `Bearer ${tokens.get('user')?.token}`)
-              .expect(404);
+                .get(`/session/${sessionId}`)
+                .set("Authorization", `Bearer ${tokens.get("user")?.token}`)
+                .expect(404);
         });
     });
 });

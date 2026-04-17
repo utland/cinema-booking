@@ -10,7 +10,7 @@ import {
 export class DeleteSessionHandler implements ICommandHandler<DeleteSessionCommand> {
     constructor(
         @Inject(SESSION_REPOSITORY_TOKEN)
-        private readonly sessionRepo: SessionRepository,
+        private readonly sessionRepo: SessionRepository
     ) {}
 
     public async execute({ sessionId }: DeleteSessionCommand): Promise<void> {

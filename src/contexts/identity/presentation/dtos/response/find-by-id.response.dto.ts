@@ -1,4 +1,3 @@
-
 import { ApiProperty } from "@nestjs/swagger";
 
 class TicketInfoDto {
@@ -8,7 +7,12 @@ class TicketInfoDto {
     @ApiProperty({ example: "The Matrix", description: "Title of the movie for the ticket" })
     movieTitle: string;
 
-    @ApiProperty({ example: "2026-06-10T14:00:00.000Z", type: String, format: "date-time", description: "Show time for the ticket" })
+    @ApiProperty({
+        example: "2026-06-10T14:00:00.000Z",
+        type: String,
+        format: "date-time",
+        description: "Show time for the ticket"
+    })
     showTime: Date;
 
     @ApiProperty({ example: 1, description: "Row number of the reserved seat" })

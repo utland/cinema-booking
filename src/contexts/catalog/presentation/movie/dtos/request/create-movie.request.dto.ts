@@ -24,13 +24,23 @@ export class CreateMovieReqDto {
     @IsString()
     genre: string;
 
-    @ApiProperty({ example: "2026-05-01T18:30:00.000Z", type: String, format: "date-time", description: "Start date of the movie rent period" })
+    @ApiProperty({
+        example: "2026-05-01T18:30:00.000Z",
+        type: String,
+        format: "date-time",
+        description: "Start date of the movie rent period"
+    })
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)
     rentStart: Date;
 
-    @ApiProperty({ example: "2026-06-01T18:30:00.000Z", type: String, format: "date-time", description: "End date of the movie rent period" })
+    @ApiProperty({
+        example: "2026-06-01T18:30:00.000Z",
+        type: String,
+        format: "date-time",
+        description: "End date of the movie rent period"
+    })
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)

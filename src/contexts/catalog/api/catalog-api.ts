@@ -41,7 +41,7 @@ export class CatalogApi {
 
     public async getMovieInfo(movieId: string): Promise<MovieCatalogDto | null> {
         const movie = await this.movieRepo.findById(movieId);
-        if (!movie) return null
+        if (!movie) return null;
 
         return {
             title: movie.title,

@@ -7,7 +7,7 @@ export class CreateSessionCommand extends Command<void> {
         public readonly bookingTime: Date,
         public readonly basePrice: number,
         public readonly movieId: string,
-        public readonly hallId: string,
+        public readonly hallId: string
     ) {
         super();
     }

@@ -1,7 +1,6 @@
-import { MoreThan, Repository } from "typeorm";
+import { LessThan, LessThanOrEqual, MoreThan, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TypeOrmMovie } from "../entities/typeorm-movie.entity";
-import { TypeOrmMovieMapper } from "../mappers/typeorm-movie.mapper";
 import { Injectable } from "@nestjs/common";
 import { toMovieInfoDto } from "../mappers/to-movie-info.mapper";
 import { toMovieListDto } from "../mappers/to-movie-list.mapper";
@@ -33,9 +32,10 @@ export class TypeOrmMovieReadRepository implements MovieReadRepository {
 
     public async findActive(): Promise<MovieListItemDto[]> {
         const today = new Date();
+        const showStart = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
         const moviesOrm = await this.movieRepo.find({
-            where: { rentStart: MoreThan(today) }
+            where: { rentEnd: MoreThan(today), rentStart: LessThanOrEqual(showStart) }
         });
 
         const movieDto = toMovieListDto(moviesOrm);

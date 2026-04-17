@@ -2,12 +2,17 @@ import { Inject, NotFoundException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { UpdateUserCommand } from "./update-user.command";
 import { USER_REPOSITORY_TOKEN, type UserRepository } from "src/contexts/identity/domain/ports/user.repository";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { type Cache } from "cache-manager";
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
     constructor(
         @Inject(USER_REPOSITORY_TOKEN)
-        private readonly userRepo: UserRepository
+        private readonly userRepo: UserRepository,
+
+        @Inject(CACHE_MANAGER)
+        private readonly cacheManager: Cache
     ) {}
 
     public async execute({ userId, firstName, lastName }: UpdateUserCommand): Promise<void> {
@@ -17,5 +22,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
         user.updateInfo(firstName, lastName);
 
         await this.userRepo.save(user);
+
+        await this.cacheManager.del(`user:${userId}:profile`);
     }
 }
