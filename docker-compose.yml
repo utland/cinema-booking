@@ -1,4 +1,87 @@
 services:
+  booking:
+    build: 
+      context: .
+      dockerfile: apps/booking/Dockerfile
+      target: development
+    command: pnpm run start:dev booking
+    env_file:
+      - ./apps/booking/.env
+    ports:
+      - 3001:3001
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - main-db
+
+  identity:
+    build: 
+      context: .
+      dockerfile: apps/identity/Dockerfile
+      target: development
+    command: pnpm run start:dev identity
+    env_file:
+      - ./apps/identity/.env
+    ports:
+      - 3002:3002
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - main-db
+
+  catalog:
+    build: 
+      context: .
+      dockerfile: apps/catalog/Dockerfile
+      target: development
+    command: pnpm run start:dev catalog
+    env_file:
+      - ./apps/catalog/.env
+    ports:
+      - 3003:3003
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - main-db
+
+  notifications:
+    build: 
+      context: .
+      dockerfile: apps/notifications/Dockerfile
+      target: development
+    command: pnpm run start:dev notifications
+    env_file:
+      - ./apps/notifications/.env
+    ports:
+      - 3004:3004
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - main-db
+
+  rabbitmq:
+    image: rabbitmq:4-management 
+    container_name: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"   
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    
+
   main-db:
     image: postgres:16
     container_name: main-cinema
@@ -16,7 +99,6 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-
   test-db:
     image: postgres:16
     container_name: test-cinema
@@ -36,5 +118,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  rabbitmq_data:
   main-db-data:
   test-db-data:

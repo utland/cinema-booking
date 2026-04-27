@@ -12,6 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2023",
     "sourceMap": true,
+    "rootDir": "./",
     "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,
@@ -21,9 +22,37 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["node", "jest"],
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "node",
+      "jest"
+    ],
+    "baseUrl": "./",
     "paths": {
-      "src/*": ["./src/*"]
-    }
+      "@app/shared-kernel": [
+        "libs/shared-kernel/src"
+      ],
+      "@app/shared-kernel/*": [
+        "libs/shared-kernel/src/*"
+      ],
+      "@app/booking": [
+        "apps/booking/src"
+      ],
+      "@app/booking/*": [
+        "apps/booking/src/*"
+      ],
+      "@app/catalog": [
+        "apps/catalog/src"
+      ],
+      "@app/catalog/*": [
+        "apps/catalog/src/*"
+      ],
+      "@app/identity": [
+        "apps/identity/src"
+      ],
+      "@app/identity/*": [
+        "apps/identity/src/*"
+      ],
+    },
   }
 }
