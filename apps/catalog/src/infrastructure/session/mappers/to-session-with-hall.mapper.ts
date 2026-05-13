@@ -1,17 +1,16 @@
 import { SessionWithHallDto } from "@app/catalog/application/session/queries/dtos/session-with-hall.dto";
+import { MongooseSessionWithHall } from "../entities/mongoose-session-with-hall.schema";
 
-export const toSessionWithHallDto = (response: any[]): SessionWithHallDto => {
-    const sessionData = response[0];
-
+export const toSessionWithHallDto = (sessionWithHall: MongooseSessionWithHall): SessionWithHallDto => {
     return {
-        sessionId: sessionData.sessionId,
-        startTime: sessionData.startTime,
-        endTime: sessionData.endTime,
-        bookingTime: sessionData.bookingTime,
-        hallId: sessionData.hallId,
-        hallName: sessionData.hallName,
-        hallType: sessionData.hallType,
-        seats: response.map((item) => {
+        sessionId: sessionWithHall.sessionId,
+        startTime: sessionWithHall.startTime,
+        endTime: sessionWithHall.endTime,
+        bookingTime: sessionWithHall.bookingTime,
+        hallId: sessionWithHall.hallId,
+        hallName: sessionWithHall.hallName,
+        hallType: sessionWithHall.hallType,
+        seats: sessionWithHall.seats.map((item) => {
             return {
                 seatId: item.seatId,
                 row: Number(item.row),

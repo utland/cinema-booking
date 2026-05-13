@@ -22,12 +22,12 @@ async function bootstrap() {
         transport: Transport.RMQ,
         options: {
             urls: [process.env.RABBITMQ_URL as string],
-            queue: "catalog_queue"
+            queue: "catalog_queue",
         }
     });
 
     await app.startAllMicroservices();
 
-    await app.listen(process.env.APP_PORT ?? 3000);
+    await app.listen(process.env.APP_PORT as string);
 }
 bootstrap();

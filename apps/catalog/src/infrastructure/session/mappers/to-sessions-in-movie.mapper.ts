@@ -1,7 +1,8 @@
 import { SessionInMovieDto } from "@app/catalog/application/session/queries/dtos/session-in-movie.dto";
+import { MongooseSessionInMovie } from "../entities/mongoose-session-card.entity";
 
-export const toSessionsInMovieDto = (result: any): SessionInMovieDto[] => {
-    return result.map((item) => {
+export const toSessionsInMovieDto = (sessionInMovie: MongooseSessionInMovie[]): SessionInMovieDto[] => {
+    return sessionInMovie.map((item) => {
         return {
             sessionId: item.sessionId,
             hallName: item.hallName,

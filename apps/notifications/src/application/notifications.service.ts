@@ -1,7 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { SENDER_SERVICE_TOKEN, type SenderService } from "./ports/sender.port";
 import { USER_NOTIFICATIONS_GATEWAY, type UserNotificationsGateway } from "../domain/user-notifications.port";
-import { SendMessageDto } from "./dtos/send-message.dto";
+import { RabbitSubscribe } from "@golevelup/nestjs-rabbitmq";
+import { TicketPaidEvent } from "@app/shared-kernel/application/events/ticket-paid.event";
 
 @Injectable()
 export class NotificationService {
@@ -13,7 +14,12 @@ export class NotificationService {
         private readonly userGateway: UserNotificationsGateway
     ) {}
 
-    async sendTransactionNotification({ userId, amount }: SendMessageDto) {
+    @RabbitSubscribe({
+        exchange: "domain_events",
+        routingKey: "ticket.paid",
+        queue: "notifications-queue"
+    })
+    async sendTransactionNotification({ userId, amount }: TicketPaidEvent) {
         const contacts = await this.userGateway.getContacts(userId);
         if (!contacts) return;
 

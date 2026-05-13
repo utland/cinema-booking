@@ -34,6 +34,8 @@ import { RolesGuard } from "@app/shared-kernel/presentation/guards/role.guard";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { CATALOG_SERVICE_TOKEN, IDENTITY_SERVICE_TOKEN } from "@app/shared-kernel/application/services/tokens";
 import { rabbitmqConfig } from "./config/rabbitmq.config";
+import { options } from "joi";
+import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
 
 const commands = [CreateTicketHandler, DeleteTicketHandler, CancelTicketHandler, PayTicketHandler];
 
@@ -100,23 +102,23 @@ const guards = [
             }
         ]),
 
-        ClientsModule.registerAsync([
-            {
-                imports: [ConfigModule],
-                name: "RABBITMQ_SERVICE",
-                useFactory: (configService: ConfigService<ConfigType>) => ({
-                    transport: Transport.RMQ,
-                    options: {
-                        urls: [configService.get("rabbitmq").url],
-                        queue: "booking_events",
-                        queueOptions: {
-                            durable: false
+        RabbitMQModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService<ConfigType>) => {
+                const options = configService.get("rabbitmq");
+
+                return {
+                    exchanges: [
+                        {
+                            name: "domain_events",
+                            type: "topic"
                         }
-                    }
-                }),
-                inject: [ConfigService]
-            }
-        ]),
+                    ],
+                    uri: options.url
+                };
+            },
+            inject: [ConfigService]
+        }),
 
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],

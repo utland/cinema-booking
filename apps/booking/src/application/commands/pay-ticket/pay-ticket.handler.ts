@@ -5,6 +5,8 @@ import { TICKET_REPOSITORY_TOKEN, type TicketRepository } from "../../../domain/
 import { PAYMENT_SERVICE_TOKEN, type PaymentService } from "../../../application/ports/payment.service";
 import { TicketStatus } from "@app/shared-kernel/domain/enums/ticket-status.enum";
 import { ClientProxy } from "@nestjs/microservices";
+import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
+import { TicketPaidEvent } from "@app/shared-kernel/application/events/ticket-paid.event";
 
 @CommandHandler(PayTicketCommand)
 export class PayTicketHandler implements ICommandHandler<PayTicketCommand> {
@@ -15,8 +17,7 @@ export class PayTicketHandler implements ICommandHandler<PayTicketCommand> {
         @Inject(PAYMENT_SERVICE_TOKEN)
         private readonly paymentService: PaymentService,
 
-        @Inject("RABBITMQ_SERVICE")
-        private readonly rabbitMqClient: ClientProxy
+        private readonly amqpConnection: AmqpConnection
     ) {}
 
     public async execute({ ticketId, userId, token }: PayTicketCommand): Promise<void> {
@@ -33,6 +34,15 @@ export class PayTicketHandler implements ICommandHandler<PayTicketCommand> {
 
         await this.ticketRepo.save(ticket);
 
-        this.rabbitMqClient.emit("ticket_paid", { amount: ticket.money.price, userId });
+        this.amqpConnection.publish(
+            "domain_events",
+            "ticket.paid",
+            new TicketPaidEvent(
+                ticket.userId, 
+                ticket.sessionId, 
+                ticket.seatId,
+                ticket.money.price
+            )
+        );
     }
 }

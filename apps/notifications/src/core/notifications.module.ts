@@ -12,7 +12,7 @@ import { rabbitmqConfig } from "./config/rabbitmq.config";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { IDENTITY_SERVICE_TOKEN } from "@app/shared-kernel/application/services/tokens";
 import { ConfigType } from "./config/config.types";
-import { config } from "process";
+import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
 
 const identityAcl = [
     { provide: USER_NOTIFICATIONS_GATEWAY, useClass: UserNotificationAdapter },
@@ -44,7 +44,25 @@ const identityAcl = [
                 }),
                 inject: [ConfigService]
             }
-        ])
+        ]),
+
+        RabbitMQModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService<ConfigType>) => {
+                const options = configService.get("rabbitmq");
+
+                return {
+                    exchanges: [
+                        {
+                            name: "domain_events",
+                            type: "topic"
+                        }
+                    ],
+                    uri: options.url
+                };
+            },
+            inject: [ConfigService]
+        }),
     ],
     providers: [NotificationService, { provide: SENDER_SERVICE_TOKEN, useClass: NodemailerService }, ...identityAcl]
 })

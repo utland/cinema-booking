@@ -13,7 +13,7 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - main-db
+      - postgres-db
 
   identity:
     build: 
@@ -29,7 +29,7 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - main-db
+      - postgres-db
 
   catalog:
     build: 
@@ -45,7 +45,8 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - main-db
+      - postgres-db
+      - mongo-db
 
   notifications:
     build: 
@@ -60,16 +61,14 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    depends_on:
-      - main-db
 
   rabbitmq:
     image: rabbitmq:4-management 
     container_name: rabbitmq
     restart: always
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
     ports:
       - "5672:5672"   
       - "15672:15672"
@@ -82,13 +81,13 @@ services:
       retries: 5
     
 
-  main-db:
+  postgres-db:
     image: postgres:16
     container_name: main-cinema
     environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cinema-booking
     ports:
       - "5432:5432"
     volumes:
@@ -99,25 +98,20 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-  test-db:
-    image: postgres:16
-    container_name: test-cinema
-    environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_TEST_DB}
+  
+  mongo-db:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
     ports:
-      - "5433:5432"
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
     volumes:
-      - test-db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d test-db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+      - mongo_data:/data/db
 
 volumes:
   rabbitmq_data:
   main-db-data:
-  test-db-data:
+  mongo_data:

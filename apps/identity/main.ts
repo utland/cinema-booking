@@ -7,8 +7,8 @@ import { Transport } from "@nestjs/microservices";
 async function bootstrap() {
     const app = await NestFactory.create(IdentityModule);
     const swaggerConfig = new DocumentBuilder()
-        .setTitle("Cinema Catalog API")
-        .setDescription("API for managing cinema catalog")
+        .setTitle("Cinema Identity API")
+        .setDescription("API for managing cinema users")
         .setVersion("1.0")
         .build();
 
@@ -28,6 +28,6 @@ async function bootstrap() {
 
     await app.startAllMicroservices();
 
-    await app.listen(process.env.APP_PORT ?? 3000);
+    await app.listen(process.env.APP_PORT as string);
 }
 bootstrap();
