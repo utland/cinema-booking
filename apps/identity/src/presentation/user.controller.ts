@@ -18,7 +18,7 @@ import { DeleteUserCommand } from "../application/commands/delete-user/delete-us
 import { UpdateUserReqDto } from "./dtos/request/update-user.request.dto";
 
 @ApiTags("Identity")
-@Controller("user")
+@Controller()
 export class UserController {
     constructor(
         private readonly commandBus: CommandBus,

@@ -1,5 +1,6 @@
 services:
   booking:
+    container_name: booking
     build: 
       context: .
       dockerfile: apps/booking/Dockerfile
@@ -14,8 +15,12 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - postgres-db
+      - rabbitmq
+    networks:
+      - cinema-network
 
   identity:
+    container_name: identity
     build: 
       context: .
       dockerfile: apps/identity/Dockerfile
@@ -30,8 +35,12 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - postgres-db
+      - rabbitmq
+    networks:
+      - cinema-network
 
   catalog:
+    container_name: catalog
     build: 
       context: .
       dockerfile: apps/catalog/Dockerfile
@@ -47,8 +56,12 @@ services:
     depends_on:
       - postgres-db
       - mongo-db
+      - rabbitmq
+    networks:
+    - cinema-network
 
   notifications:
+    container_name: notifications
     build: 
       context: .
       dockerfile: apps/notifications/Dockerfile
@@ -61,6 +74,10 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    depends_on:
+      - rabbitmq
+    networks:
+      - cinema-network
 
   rabbitmq:
     image: rabbitmq:4-management 
@@ -79,6 +96,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    networks:
+      - cinema-network
     
 
   postgres-db:
@@ -98,6 +117,8 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - cinema-network
   
   mongo-db:
     image: mongo:latest
@@ -110,6 +131,26 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password123
     volumes:
       - mongo_data:/data/db
+    networks:
+      - cinema-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - cinema-network
+    depends_on:
+      - booking
+      - catalog
+      - identity
+
+networks:
+  cinema-network:
+    driver: bridge
 
 volumes:
   rabbitmq_data:
