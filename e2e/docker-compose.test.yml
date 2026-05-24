@@ -1,0 +1,180 @@
+services:
+  e2e:
+    build:
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./specs:/usr/src/app/specs
+    depends_on:
+      test-booking:
+        condition: service_healthy
+      test-identity:
+        condition: service_healthy
+      test-catalog:
+        condition: service_healthy
+      test-notifications:
+        condition: service_healthy
+      test-rabbitmq:
+        condition: service_healthy
+      test-postgres-db:
+        condition: service_healthy
+      test-mongo-db:
+        condition: service_healthy
+    networks:
+      - cinema-network
+
+  test-booking:
+    build: 
+      context: ..
+      dockerfile: ./apps/booking/Dockerfile
+      target: production
+    env_file:
+      - ./test.env
+    environment:
+      - APP_PORT=3001
+    ports:
+      - 3001:3001
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3001', () => process.exit(0)).on('error', () => process.exit(1))\""]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      test-postgres-db:
+        condition: service_healthy
+      test-rabbitmq:
+        condition: service_healthy
+    networks:
+      - cinema-network
+
+  test-identity:
+    build: 
+      context: ..
+      dockerfile: ./apps/identity/Dockerfile
+      target: production
+    env_file:
+      - ./test.env
+    environment:
+      - APP_PORT=3002
+    ports:
+      - 3002:3002
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3002', () => process.exit(0)).on('error', () => process.exit(1))\""]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      test-postgres-db:
+        condition: service_healthy
+      test-rabbitmq:
+        condition: service_healthy
+    networks:
+    - cinema-network
+
+  test-catalog:
+    build: 
+      context: ..
+      dockerfile: ./apps/catalog/Dockerfile
+      target: production
+    env_file:
+      - ./test.env
+    environment:
+      - APP_PORT=3003
+    ports:
+      - 3003:3003
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3003', () => process.exit(0)).on('error', () => process.exit(1))\""]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      test-postgres-db:
+        condition: service_healthy
+      test-mongo-db:
+        condition: service_healthy
+      test-rabbitmq:
+        condition: service_healthy
+    networks:
+    - cinema-network
+
+  test-notifications:
+    build: 
+      context: ..
+      target: production
+      dockerfile: ./apps/notifications/Dockerfile
+    env_file:
+      - ./test.env
+    environment:
+      - APP_PORT=3004
+    ports:
+      - 3004:3004
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3004', () => process.exit(0)).on('error', () => process.exit(1))\""]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      test-rabbitmq:
+        condition: service_healthy
+    networks:
+      - cinema-network
+
+  test-rabbitmq:
+    image: rabbitmq:4-management 
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    ports:
+      - "5672:5672"   
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cinema-network
+    
+  test-postgres-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cinema-booking
+    ports:
+      - "5432:5432"
+    volumes:
+      - main-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d cinema-booking"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cinema-network
+  
+  test-mongo-db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cinema-network
+
+networks:
+  cinema-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  main-db-data:
+  mongo-data:

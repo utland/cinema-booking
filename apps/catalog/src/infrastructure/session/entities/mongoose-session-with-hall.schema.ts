@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
 type SeatInfo = {
@@ -6,7 +6,7 @@ type SeatInfo = {
     row: number;
     column: number;
     isAvailable: string;
-}
+};
 
 @Schema()
 export class MongooseSessionWithHall extends Document {
@@ -31,8 +31,8 @@ export class MongooseSessionWithHall extends Document {
     @Prop()
     hallType: string;
 
-    @Prop({ type: [Object]})
-    seats: SeatInfo[]
+    @Prop({ type: [Object] })
+    seats: SeatInfo[];
 }
 
 export const MongooseSessionWithHallSchema = SchemaFactory.createForClass(MongooseSessionWithHall);

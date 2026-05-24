@@ -10,5 +10,5 @@ export const catalogSchema = Joi.object({
     DATABASE_SYNC: Joi.number().valid(0, 1).required(),
     APP_PORT: Joi.number().required(),
     RABBITMQ_URL: Joi.string().required(),
-    MONGODB_URL: Joi.string().required(),
+    MONGODB_URL: Joi.string().required()
 });

@@ -1,14 +1,16 @@
-import { Controller, Inject, Injectable } from "@nestjs/common";
-import { HALL_REPOSITORY_TOKEN, type HallRepository } from "./domain/hall/ports/hall.repository";
-import { SESSION_REPOSITORY_TOKEN, type SessionRepository } from "./domain/session/ports/session.repository";
-import { MOVIE_REPOSITORY_TOKEN, type MovieRepository } from "./domain/movie/ports/movie.repository";
+import { Inject, Injectable } from "@nestjs/common";
+import { HALL_REPOSITORY_TOKEN, type HallRepository } from "../../domain/hall/ports/hall.repository";
+import { SESSION_REPOSITORY_TOKEN, type SessionRepository } from "../../domain/session/ports/session.repository";
+import { MOVIE_REPOSITORY_TOKEN, type MovieRepository } from "../../domain/movie/ports/movie.repository";
 import { HallCatalogDto } from "@app/shared-kernel/application/services/dtos/catalog/hall-catalog.dto";
 import { SessionCatalogDto } from "@app/shared-kernel/application/services/dtos/catalog/session-catalog.dto";
 import { MovieCatalogDto } from "@app/shared-kernel/application/services/dtos/catalog/movie-catalog.dto";
-import { MessagePattern } from "@nestjs/microservices";
+import { RabbitRPC } from "@golevelup/nestjs-rabbitmq";
+import { Public } from "@app/shared-kernel/presentation/decorators/public.decorator";
 
-@Controller()
-export class CatalogApiController {
+@Public()
+@Injectable()
+export class CatalogApiService {
     constructor(
         @Inject(HALL_REPOSITORY_TOKEN)
         private readonly hallRepo: HallRepository,
@@ -20,16 +22,24 @@ export class CatalogApiController {
         private readonly movieRepo: MovieRepository
     ) {}
 
-    @MessagePattern("get_hall_info")
-    public async getHallInfo(hallId: string): Promise<HallCatalogDto | null> {
+    @RabbitRPC({
+        exchange: "domain_events",
+        routingKey: "get_hall_info",
+        queue: "catalog-queue"
+    })
+    public async getHallInfo({ hallId }: { hallId: string }): Promise<HallCatalogDto | null> {
         const hall = await this.hallRepo.findById(hallId);
         if (!hall) return null;
 
         return { name: hall.name, seats: hall.seats };
     }
 
-    @MessagePattern("get_session_info")
-    public async getSessionInfo(sessionId: string): Promise<SessionCatalogDto | null> {
+    @RabbitRPC({
+        exchange: "domain_events",
+        routingKey: "get_session_info",
+        queue: "catalog-queue"
+    })
+    public async getSessionInfo({ sessionId }: { sessionId: string }): Promise<SessionCatalogDto | null> {
         const session = await this.sessionRepo.findById(sessionId);
         if (!session) return null;
 
@@ -42,8 +52,12 @@ export class CatalogApiController {
         };
     }
 
-    @MessagePattern("get_movie_info")
-    public async getMovieInfo(movieId: string): Promise<MovieCatalogDto | null> {
+    @RabbitRPC({
+        exchange: "domain_events",
+        routingKey: "get_movie_info",
+        queue: "catalog-queue"
+    })
+    public async getMovieInfo({ movieId }: { movieId: string }): Promise<MovieCatalogDto | null> {
         const movie = await this.movieRepo.findById(movieId);
         if (!movie) return null;
 

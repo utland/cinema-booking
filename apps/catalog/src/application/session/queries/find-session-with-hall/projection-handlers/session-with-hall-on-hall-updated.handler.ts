@@ -1,6 +1,9 @@
 import { EventsHandler, IEventHandler } from "@nestjs/cqrs";
 import { Inject } from "@nestjs/common";
-import { SESSION_WITH_HALL_REPOSITORY_TOKEN, type SessionWithHallRepository } from "../../../ports/session-with-hall.repository";
+import {
+    SESSION_WITH_HALL_REPOSITORY_TOKEN,
+    type SessionWithHallRepository
+} from "../../../ports/session-with-hall.repository";
 import { HallUpdatedEvent } from "@app/catalog/application/common/events/hall-updated.event";
 
 @EventsHandler(HallUpdatedEvent)

@@ -1,5 +1,5 @@
 import { TICKET_REPOSITORY_TOKEN, type TicketRepository } from "../ports/ticket.repository";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { Ticket } from "../models/ticket.entity";
 import { CATALOG_GATEWAY, type CatalogBookingGateway } from "../ports/catalog-booking.port";
 import { CalculateTicketPriceService } from "../domain-services/calculate-ticket-price.service";
@@ -30,14 +30,18 @@ export class TicketFactory implements DomainFactory<Ticket> {
     public async create(args: TicketFactoryArgs): Promise<Ticket> {
         const { seatId, sessionId, userId, hallId } = args;
 
-        const session = await this.catalogGateway.getSession(sessionId);
+        const session = await this.catalogGateway.getSession(sessionId).catch(() => {
+            throw new InternalServerErrorException("CatalogService is unavailable");
+        });
 
         if (!session) throw new NotFoundDomainException("Session doesn't exist");
         if (!session.isReservationAvailable()) {
             throw new ConflictDomainException("Booking is not available");
         }
 
-        const seats = await this.catalogGateway.getSeats(hallId);
+        const seats = await this.catalogGateway.getSeats(hallId).catch(() => {
+            throw new InternalServerErrorException("CatalogService is unavailable");
+        });
         if (!seats) throw new NotFoundDomainException("This hall is not found");
 
         const seat = seats.find((item) => item.id === seatId);

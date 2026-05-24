@@ -23,14 +23,9 @@ export class DeleteTicketHandler implements ICommandHandler<DeleteTicketCommand>
         await this.ticketRepo.delete(ticket);
 
         this.amqpConnection.publish(
-            "domain_events", 
+            "domain_events",
             "ticket.updated",
-            new TicketUpdatedEvent(
-                ticket.userId, 
-                ticket.sessionId, 
-                ticket.seatId, 
-                "canceled"
-            )
+            new TicketUpdatedEvent(ticket.userId, ticket.sessionId, ticket.seatId, "canceled")
         );
     }
 }

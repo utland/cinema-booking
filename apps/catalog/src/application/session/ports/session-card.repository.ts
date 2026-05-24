@@ -10,7 +10,7 @@ export type SessionInMovieArgs = {
     end: Date;
     bookingTime: Date;
     basePrice: number;
-}
+};
 
 export interface SessionInMovieRepository {
     findByMovieId(movieId: string, dateOfSession: Date): Promise<SessionInMovieDto[]>;

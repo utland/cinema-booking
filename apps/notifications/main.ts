@@ -1,5 +1,4 @@
 import { NestFactory } from "@nestjs/core";
-import { Transport } from "@nestjs/microservices";
 import { NotificationsModule } from "./src/core/notifications.module";
 
 async function bootstrap() {

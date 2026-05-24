@@ -1,4 +1,3 @@
-
 type TicketType = "canceled" | "booked";
 
 export class TicketUpdatedEvent {

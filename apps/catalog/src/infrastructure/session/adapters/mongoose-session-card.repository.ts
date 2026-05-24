@@ -1,4 +1,7 @@
-import { SessionInMovieArgs, SessionInMovieRepository } from "@app/catalog/application/session/ports/session-card.repository";
+import {
+    SessionInMovieArgs,
+    SessionInMovieRepository
+} from "@app/catalog/application/session/ports/session-card.repository";
 import { Hall } from "@app/catalog/domain/hall/models/hall.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { MongooseSessionInMovie } from "../entities/mongoose-session-card.entity";
@@ -14,10 +17,12 @@ export class MongooseSessionInMovieRepository implements SessionInMovieRepositor
     ) {}
 
     public async findByMovieId(movieId: string, dateOfSession: Date): Promise<SessionInMovieDto[]> {
-        const sessions = await this.sessionInMovieModel.find({ 
-            movieId,  
-            startTime: { $gte: startOfDay(dateOfSession), $lt: endOfDay(dateOfSession) }
-        }).exec();
+        const sessions = await this.sessionInMovieModel
+            .find({
+                movieId,
+                startTime: { $gte: startOfDay(dateOfSession), $lt: endOfDay(dateOfSession) }
+            })
+            .exec();
 
         return toSessionsInMovieDto(sessions);
     }
@@ -37,32 +42,31 @@ export class MongooseSessionInMovieRepository implements SessionInMovieRepositor
         await sessionInMovie.save();
     }
 
-    public async updateSession(
-        sessionArgs: SessionInMovieArgs
-    ): Promise<void> {
-        await this.sessionInMovieModel.updateOne(
-            { sessionId: sessionArgs.sessionId },
-            { $set: { 
-                    startTime: sessionArgs.start, 
-                    endTime: sessionArgs.end, 
-                    bookingTime: sessionArgs.bookingTime, 
-                    basePrice: sessionArgs.basePrice 
-                } 
-            }
-        ).exec();  
+    public async updateSession(sessionArgs: SessionInMovieArgs): Promise<void> {
+        await this.sessionInMovieModel
+            .updateOne(
+                { sessionId: sessionArgs.sessionId },
+                {
+                    $set: {
+                        startTime: sessionArgs.start,
+                        endTime: sessionArgs.end,
+                        bookingTime: sessionArgs.bookingTime,
+                        basePrice: sessionArgs.basePrice
+                    }
+                }
+            )
+            .exec();
     }
 
     public async updateHall(name: string, seatsAmount: number): Promise<void> {
-        await this.sessionInMovieModel.updateMany(
-            { hallName: name },
-            { $set: { availableSeats: seatsAmount, totalSeats: seatsAmount } }
-        ).exec();
+        await this.sessionInMovieModel
+            .updateMany({ hallName: name }, { $set: { availableSeats: seatsAmount, totalSeats: seatsAmount } })
+            .exec();
     }
 
-    public async updateAvailable(sessionId: string,operation: "increase" | "decrease"): Promise<void> {
-        await this.sessionInMovieModel.updateOne(
-            { sessionId },
-            { $inc: { availableSeats: operation === "increase" ? 1 : -1 } }
-        ).exec();
+    public async updateAvailable(sessionId: string, operation: "increase" | "decrease"): Promise<void> {
+        await this.sessionInMovieModel
+            .updateOne({ sessionId }, { $inc: { availableSeats: operation === "increase" ? 1 : -1 } })
+            .exec();
     }
 }

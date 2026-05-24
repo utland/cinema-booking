@@ -1,17 +1,21 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+    CanActivate,
+    ExecutionContext,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    UnauthorizedException
+} from "@nestjs/common";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 import { Request } from "express";
 import { Reflector } from "@nestjs/core";
-import { IDENTITY_SERVICE_TOKEN } from "@app/shared-kernel/application/services/tokens";
-import { ClientProxy } from "@nestjs/microservices";
-import { firstValueFrom } from "rxjs";
 import { Payload } from "@app/shared-kernel/interfaces/payload.i";
+import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(
-        @Inject(IDENTITY_SERVICE_TOKEN)
-        private identityClient: ClientProxy,
+        private readonly amqpConnection: AmqpConnection,
         private reflector: Reflector
     ) {}
 
@@ -26,13 +30,18 @@ export class AuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
 
-        if (!token) {
-            throw new UnauthorizedException("Token is absent");
-        }
+        if (!token) throw new UnauthorizedException("Token is absent");
 
-        const res = this.identityClient.send<Payload | null>({ cmd: "check_token" }, token);
+        const payload = await this.amqpConnection
+            .request<Payload | null>({
+                exchange: "domain_events",
+                routingKey: "check_token",
+                payload: { token }
+            })
+            .catch(() => {
+                throw new InternalServerErrorException("IdentityService is unavailable");
+            });
 
-        const payload = await firstValueFrom(res);
         if (!payload) throw new UnauthorizedException("Token is invalid");
 
         request["user"] = payload;

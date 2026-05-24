@@ -62,7 +62,7 @@ const identityAcl = [
                 };
             },
             inject: [ConfigService]
-        }),
+        })
     ],
     providers: [NotificationService, { provide: SENDER_SERVICE_TOKEN, useClass: NodemailerService }, ...identityAcl]
 })

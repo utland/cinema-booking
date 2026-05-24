@@ -18,16 +18,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
     app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-    app.connectMicroservice({
-        transport: Transport.RMQ,
-        options: {
-            urls: [process.env.RABBITMQ_URL as string],
-            queue: "identity_queue"
-        }
-    });
-
-    await app.startAllMicroservices();
-
     await app.listen(process.env.APP_PORT as string);
 }
+
 bootstrap();

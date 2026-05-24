@@ -49,10 +49,8 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { catalogSchema } from "./config/schema";
 import { databaseConfig } from "./config/database.config";
 import { CqrsModule } from "@nestjs/cqrs";
-import { ClientsModule, Transport } from "@nestjs/microservices";
-import { IDENTITY_SERVICE_TOKEN } from "@app/shared-kernel/application/services/tokens";
 import { ConfigType } from "./config/config.types";
-import { CatalogApiController } from "../catalog-api.controller";
+import { CatalogApiService } from "../application/common/catalog-api.service";
 import { CacheModule } from "@nestjs/cache-manager";
 import { rabbitmqConfig } from "./config/rabbitmq.config";
 import { SESSION_WITH_HALL_REPOSITORY_TOKEN } from "../application/session/ports/session-with-hall.repository";
@@ -69,8 +67,14 @@ import { SessionCardOnHallUpdatedHandler } from "../application/session/queries/
 import { SessionCardOnTicketUpdatedHandler } from "../application/session/queries/find-sessions-by-movie/projection-handlers/session-card-on-ticket-updated.handler";
 import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
 import { MongooseModule } from "@nestjs/mongoose";
-import { MongooseSessionWithHall, MongooseSessionWithHallSchema } from "../infrastructure/session/entities/mongoose-session-with-hall.schema";
-import { MongooseSessionInMovie, MongooseSessionInMovieSchema } from "../infrastructure/session/entities/mongoose-session-card.entity";
+import {
+    MongooseSessionWithHall,
+    MongooseSessionWithHallSchema
+} from "../infrastructure/session/entities/mongoose-session-with-hall.schema";
+import {
+    MongooseSessionInMovie,
+    MongooseSessionInMovieSchema
+} from "../infrastructure/session/entities/mongoose-session-card.entity";
 import { readDatabaseConfig } from "./config/read-database.config";
 
 const commands = [
@@ -110,7 +114,7 @@ const projectionHandlers = [
     SessionCardUpdatedHandler,
     SessionCardOnHallUpdatedHandler,
     SessionCardOnTicketUpdatedHandler
-]
+];
 
 const mappers = [TypeOrmHallMapper, TypeOrmMovieMapper, TypeOrmSessionMapper];
 
@@ -152,28 +156,6 @@ const guards = [
 
         CacheModule.register({ isGlobal: true }),
 
-        ClientsModule.registerAsync([
-            {
-                imports: [ConfigModule],
-                name: IDENTITY_SERVICE_TOKEN,
-                useFactory: (configService: ConfigService<ConfigType>) => {
-                    const options = configService.get("rabbitmq");
-
-                    return {
-                        transport: Transport.RMQ,
-                        options: {
-                            urls: [options.url],
-                            queue: "identity_queue",
-                            queueOptions: {
-                                durable: true
-                            }
-                        }
-                    };
-                },
-                inject: [ConfigService]
-            }
-        ]),
-
         RabbitMQModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService<ConfigType>) => {
@@ -210,14 +192,15 @@ const guards = [
         }),
 
         TypeOrmModule.forFeature([TypeOrmHall, TypeOrmSeat, TypeOrmMovie, TypeOrmSession]),
-        
+
         MongooseModule.forFeature([
             { name: MongooseSessionWithHall.name, schema: MongooseSessionWithHallSchema },
-            { name: MongooseSessionInMovie.name, schema: MongooseSessionInMovieSchema}
+            { name: MongooseSessionInMovie.name, schema: MongooseSessionInMovieSchema }
         ])
     ],
-    controllers: [HallController, SessionController, MovieController, CatalogApiController],
+    controllers: [HallController, SessionController, MovieController],
     providers: [
+        CatalogApiService,
         ...commands,
         ...queries,
         ...projectionHandlers,

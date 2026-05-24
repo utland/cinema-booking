@@ -30,10 +30,10 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { TypeOrmUser } from "../infrastructure/persistence/entities/typeorm-user.entity";
 import { CacheModule } from "@nestjs/cache-manager";
 import { UserController } from "../presentation/user.controller";
-import { IdentityApiController } from "../user-api.controller";
-import { IDENTITY_SERVICE_TOKEN } from "@app/shared-kernel/application/services/tokens";
+import { IdentityApiService } from "../application/user-api.service";
 import { AuthGuard } from "../presentation/guards/auth.guard";
 import { rabbitmqConfig } from "./config/rabbitmq.config";
+import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
 
 const commands = [CreateUserHandler, DeleteUserHandler, UpdateUserHandler];
 
@@ -89,6 +89,24 @@ const guards = [
 
         CqrsModule.forRoot(),
 
+        RabbitMQModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService<ConfigType>) => {
+                const options = configService.get("rabbitmq");
+
+                return {
+                    exchanges: [
+                        {
+                            name: "domain_events",
+                            type: "topic"
+                        }
+                    ],
+                    uri: options.url
+                };
+            },
+            inject: [ConfigService]
+        }),
+
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -100,7 +118,16 @@ const guards = [
 
         TypeOrmModule.forFeature([TypeOrmUser])
     ],
-    controllers: [UserController, IdentityApiController],
-    providers: [TypeOrmUserMapper, ...commands, ...queries, ...repositories, ...externalServices, ...filters, ...guards]
+    controllers: [UserController],
+    providers: [
+        IdentityApiService,
+        TypeOrmUserMapper,
+        ...commands,
+        ...queries,
+        ...repositories,
+        ...externalServices,
+        ...filters,
+        ...guards
+    ]
 })
 export class IdentityModule {}

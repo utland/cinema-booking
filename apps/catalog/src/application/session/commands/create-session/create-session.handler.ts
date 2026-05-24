@@ -35,14 +35,16 @@ export class CreateSessionHandler implements ICommandHandler<CreateSessionComman
 
         await this.sessionRepo.save(session);
 
-        this.eventBus.publish(new SessionCreatedEvent(
-            session.id,
-            session.movieId,
-            session.hallId,
-            session.basePrice,
-            session.timePeriod.startTime,
-            session.timePeriod.endTime,
-            session.bookingTime
-        ))
+        this.eventBus.publish(
+            new SessionCreatedEvent(
+                session.id,
+                session.movieId,
+                session.hallId,
+                session.basePrice,
+                session.timePeriod.startTime,
+                session.timePeriod.endTime,
+                session.bookingTime
+            )
+        );
     }
 }

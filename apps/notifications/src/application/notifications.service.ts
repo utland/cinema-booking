@@ -3,7 +3,9 @@ import { SENDER_SERVICE_TOKEN, type SenderService } from "./ports/sender.port";
 import { USER_NOTIFICATIONS_GATEWAY, type UserNotificationsGateway } from "../domain/user-notifications.port";
 import { RabbitSubscribe } from "@golevelup/nestjs-rabbitmq";
 import { TicketPaidEvent } from "@app/shared-kernel/application/events/ticket-paid.event";
+import { Public } from "@app/shared-kernel/presentation/decorators/public.decorator";
 
+@Public()
 @Injectable()
 export class NotificationService {
     constructor(

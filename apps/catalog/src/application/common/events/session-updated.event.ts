@@ -7,6 +7,6 @@ export class SessionUpdatedEvent {
         public readonly basePrice: number,
         public readonly startTime: Date,
         public readonly finishTime: Date,
-        public readonly bookingTime: Date,
+        public readonly bookingTime: Date
     ) {}
 }

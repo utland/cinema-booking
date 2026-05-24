@@ -4,7 +4,6 @@ import { PayTicketCommand } from "./pay-ticket.command";
 import { TICKET_REPOSITORY_TOKEN, type TicketRepository } from "../../../domain/ports/ticket.repository";
 import { PAYMENT_SERVICE_TOKEN, type PaymentService } from "../../../application/ports/payment.service";
 import { TicketStatus } from "@app/shared-kernel/domain/enums/ticket-status.enum";
-import { ClientProxy } from "@nestjs/microservices";
 import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 import { TicketPaidEvent } from "@app/shared-kernel/application/events/ticket-paid.event";
 
@@ -28,7 +27,7 @@ export class PayTicketHandler implements ICommandHandler<PayTicketCommand> {
         ticket.updateStatus(TicketStatus.PAID);
 
         const response = await this.paymentService.chargePayment(token, ticket.money.price);
-        if (!response) throw new InternalServerErrorException("Server error");
+        if (!response) throw new InternalServerErrorException("PaymentServer error");
 
         if (response.status !== "success") throw new ConflictException("Payment is failed");
 
@@ -37,12 +36,7 @@ export class PayTicketHandler implements ICommandHandler<PayTicketCommand> {
         this.amqpConnection.publish(
             "domain_events",
             "ticket.paid",
-            new TicketPaidEvent(
-                ticket.userId, 
-                ticket.sessionId, 
-                ticket.seatId,
-                ticket.money.price
-            )
+            new TicketPaidEvent(ticket.userId, ticket.sessionId, ticket.seatId, ticket.money.price)
         );
     }
 }

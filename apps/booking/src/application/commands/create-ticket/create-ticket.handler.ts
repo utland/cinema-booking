@@ -8,7 +8,7 @@ import { TicketUpdatedEvent } from "@app/shared-kernel/application/events/ticket
 export class CreateTicketHandler implements ICommandHandler<CreateTicketCommand> {
     constructor(
         private readonly ticketFactory: TicketFactory,
-        
+
         private readonly amqpConnection: AmqpConnection
     ) {}
 
@@ -16,14 +16,9 @@ export class CreateTicketHandler implements ICommandHandler<CreateTicketCommand>
         const ticket = await this.ticketFactory.create({ sessionId, seatId, userId, hallId });
 
         this.amqpConnection.publish(
-            "domain_events", 
+            "domain_events",
             "ticket.updated",
-            new TicketUpdatedEvent(
-                ticket.userId, 
-                ticket.sessionId, 
-                ticket.seatId, 
-                "booked"
-            )
+            new TicketUpdatedEvent(ticket.userId, ticket.sessionId, ticket.seatId, "booked")
         );
     }
 }

@@ -31,10 +31,7 @@ import { ForbiddenExceptionFilter } from "@app/shared-kernel/presentation/filter
 import { ConflictExceptionFilter } from "@app/shared-kernel/presentation/filters/conflict.filter";
 import { AuthGuard } from "@app/shared-kernel/presentation/guards/auth.guard";
 import { RolesGuard } from "@app/shared-kernel/presentation/guards/role.guard";
-import { ClientsModule, Transport } from "@nestjs/microservices";
-import { CATALOG_SERVICE_TOKEN, IDENTITY_SERVICE_TOKEN } from "@app/shared-kernel/application/services/tokens";
 import { rabbitmqConfig } from "./config/rabbitmq.config";
-import { options } from "joi";
 import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
 
 const commands = [CreateTicketHandler, DeleteTicketHandler, CancelTicketHandler, PayTicketHandler];
@@ -65,42 +62,6 @@ const guards = [
         }),
 
         CqrsModule.forRoot(),
-
-        ClientsModule.registerAsync([
-            {
-                imports: [ConfigModule],
-                name: IDENTITY_SERVICE_TOKEN,
-                useFactory: (configService: ConfigService<ConfigType>) => ({
-                    transport: Transport.RMQ,
-                    options: {
-                        urls: [configService.get("rabbitmq").url],
-                        queue: "identity_queue",
-                        queueOptions: {
-                            durable: true
-                        }
-                    }
-                }),
-                inject: [ConfigService]
-            }
-        ]),
-
-        ClientsModule.registerAsync([
-            {
-                imports: [ConfigModule],
-                name: CATALOG_SERVICE_TOKEN,
-                useFactory: (configService: ConfigService<ConfigType>) => ({
-                    transport: Transport.RMQ,
-                    options: {
-                        urls: [configService.get("rabbitmq").url],
-                        queue: "catalog_queue",
-                        queueOptions: {
-                            durable: true
-                        }
-                    }
-                }),
-                inject: [ConfigService]
-            }
-        ]),
 
         RabbitMQModule.forRootAsync({
             imports: [ConfigModule],

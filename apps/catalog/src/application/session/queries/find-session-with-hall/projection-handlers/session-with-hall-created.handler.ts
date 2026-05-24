@@ -1,7 +1,10 @@
 import { SessionCreatedEvent } from "@app/catalog/application/common/events/session-created.event";
 import { EventsHandler, IEventHandler } from "@nestjs/cqrs";
 import { Inject } from "@nestjs/common";
-import { SESSION_WITH_HALL_REPOSITORY_TOKEN, type SessionWithHallRepository } from "../../../ports/session-with-hall.repository";
+import {
+    SESSION_WITH_HALL_REPOSITORY_TOKEN,
+    type SessionWithHallRepository
+} from "../../../ports/session-with-hall.repository";
 import { HALL_REPOSITORY_TOKEN, type HallRepository } from "@app/catalog/domain/hall/ports/hall.repository";
 
 @EventsHandler(SessionCreatedEvent)
@@ -18,9 +21,6 @@ export class SessionWithHallCreatedHandler implements IEventHandler<SessionCreat
         const hall = await this.hallRepo.findById(hallId);
         if (!hall) return;
 
-        await this.sessionWithHallRepo.save(
-            { sessionId, start: startTime, end: finishTime, bookingTime }, 
-            hall
-        );
+        await this.sessionWithHallRepo.save({ sessionId, start: startTime, end: finishTime, bookingTime }, hall);
     }
 }

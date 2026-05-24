@@ -2,7 +2,10 @@ import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { FindSessionWithHallQuery } from "./find-session-with-hall.query";
 import { SessionWithHallDto } from "../dtos/session-with-hall.dto";
 import { Inject, NotFoundException } from "@nestjs/common";
-import { SESSION_WITH_HALL_REPOSITORY_TOKEN, type SessionWithHallRepository } from "../../ports/session-with-hall.repository";
+import {
+    SESSION_WITH_HALL_REPOSITORY_TOKEN,
+    type SessionWithHallRepository
+} from "../../ports/session-with-hall.repository";
 
 @QueryHandler(FindSessionWithHallQuery)
 export class FindSessionWithHallHandler implements IQueryHandler<FindSessionWithHallQuery> {

@@ -1,12 +1,14 @@
-import { Controller, Inject } from "@nestjs/common";
-import { CREDENTIAL_SERVICE_TOKEN, type CredentialService } from "./domain/ports/credential.service";
-import { USER_REPOSITORY_TOKEN, type UserRepository } from "./domain/ports/user.repository";
+import { Inject, Injectable } from "@nestjs/common";
+import { CREDENTIAL_SERVICE_TOKEN, type CredentialService } from "../domain/ports/credential.service";
+import { USER_REPOSITORY_TOKEN, type UserRepository } from "../domain/ports/user.repository";
 import { Payload as JwtPayload } from "@app/shared-kernel/interfaces/payload.i";
-import { MessagePattern, Payload } from "@nestjs/microservices";
 import { UserIdentityDto } from "@app/shared-kernel/application/services/dtos/identity/user-identity.dto";
+import { RabbitRPC } from "@golevelup/nestjs-rabbitmq";
+import { Public } from "@app/shared-kernel/presentation/decorators/public.decorator";
 
-@Controller()
-export class IdentityApiController {
+@Public()
+@Injectable()
+export class IdentityApiService {
     constructor(
         @Inject(CREDENTIAL_SERVICE_TOKEN)
         private readonly credentialService: CredentialService,
@@ -15,8 +17,12 @@ export class IdentityApiController {
         private readonly userRepository: UserRepository
     ) {}
 
-    @MessagePattern({ cmd: "check_token" })
-    public async checkToken(@Payload() token: string): Promise<JwtPayload | null> {
+    @RabbitRPC({
+        exchange: "domain_events",
+        routingKey: "check_token",
+        queue: "catalog-queue"
+    })
+    public async checkToken({ token }: { token: string }): Promise<JwtPayload | null> {
         try {
             const payload = await this.credentialService.verify(token);
             return payload;
@@ -25,8 +31,12 @@ export class IdentityApiController {
         }
     }
 
-    @MessagePattern({ cmd: "get_user_info" })
-    public async getUserInfo(@Payload() { userId }: { userId: string }): Promise<UserIdentityDto | null> {
+    @RabbitRPC({
+        exchange: "domain_events",
+        routingKey: "get_user_info",
+        queue: "catalog-queue"
+    })
+    public async getUserInfo({ userId }: { userId: string }): Promise<UserIdentityDto | null> {
         const user = await this.userRepository.findById(userId);
         if (!user) return null;
 

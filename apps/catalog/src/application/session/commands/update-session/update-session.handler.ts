@@ -30,12 +30,14 @@ export class UpdateSessionHandler implements ICommandHandler<UpdateSessionComman
 
         await this.sessionRepo.save(session);
 
-        this.eventBus.publish(new SessionUpdatedEvent(
-            session.id,
-            session.basePrice,
-            session.timePeriod.startTime,
-            session.timePeriod.endTime,
-            session.bookingTime
-        ));
+        this.eventBus.publish(
+            new SessionUpdatedEvent(
+                session.id,
+                session.basePrice,
+                session.timePeriod.startTime,
+                session.timePeriod.endTime,
+                session.bookingTime
+            )
+        );
     }
 }

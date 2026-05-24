@@ -3,7 +3,7 @@ import { Hall } from "@app/catalog/domain/hall/models/hall.entity";
 type SeatInfo = {
     row: number;
     column: number;
-}
+};
 
 export class HallUpdatedEvent {
     constructor(

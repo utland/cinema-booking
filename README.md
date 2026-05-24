@@ -1,37 +1,30 @@
 ## Project setup
 
 ```bash
-$ pnpm install
+$ npm install
 ```
-## Deploy docker
+## Run the app
 
 ```bash
-# Docker should be installed and configured
-$ docker-compose up
+$ docker compose up -d --build
 ```
 
-## Compile and run the project
+## Compile and run the specific service 
 
 ```bash
 # development
-$ pnpm run start
+$ npm run start *service_name*
 
 # watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+$ npm run start:dev *service_name*
 ```
 
 ## Run tests
 
 ```bash
 # unit tests
-$ pnpm run test
+$ npm run test
 
 # e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+$ npm run test:e2e
 ```

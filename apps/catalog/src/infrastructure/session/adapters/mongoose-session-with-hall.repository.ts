@@ -1,4 +1,7 @@
-import { SessionWithHallArgs, SessionWithHallRepository } from "@app/catalog/application/session/ports/session-with-hall.repository";
+import {
+    SessionWithHallArgs,
+    SessionWithHallRepository
+} from "@app/catalog/application/session/ports/session-with-hall.repository";
 import { SessionWithHallDto } from "@app/catalog/application/session/queries/dtos/session-with-hall.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
@@ -12,11 +15,10 @@ export class MongooseSessionWithHallRepository implements SessionWithHallReposit
         private readonly sessionWithHallModel: Model<MongooseSessionWithHall>
     ) {}
 
-    
     public async findById(sessionId: string): Promise<SessionWithHallDto | null> {
         const session = await this.sessionWithHallModel.findOne({ sessionId }).exec();
         if (!session) return null;
-        
+
         return toSessionWithHallDto(session);
     }
 
@@ -42,28 +44,28 @@ export class MongooseSessionWithHallRepository implements SessionWithHallReposit
         await sessionWithHall.save();
     }
 
-    public async updateSession(
-        sessionArgs: SessionWithHallArgs
-    ): Promise<void> {
-        await this.sessionWithHallModel.updateOne(
-            { sessionId: sessionArgs.sessionId },
-            { $set: { startTime: sessionArgs.start, endTime: sessionArgs.end, bookingTime: sessionArgs.bookingTime } }
-        ).exec();    
+    public async updateSession(sessionArgs: SessionWithHallArgs): Promise<void> {
+        await this.sessionWithHallModel
+            .updateOne(
+                { sessionId: sessionArgs.sessionId },
+                {
+                    $set: {
+                        startTime: sessionArgs.start,
+                        endTime: sessionArgs.end,
+                        bookingTime: sessionArgs.bookingTime
+                    }
+                }
+            )
+            .exec();
     }
 
-    public async updateHall(id: string,name: string, type: string): Promise<void> {
-        await this.sessionWithHallModel.updateMany(
-            { hallId: id },
-            { $set: { hallType: type, hallName: name } }
-        ).exec();
+    public async updateHall(id: string, name: string, type: string): Promise<void> {
+        await this.sessionWithHallModel.updateMany({ hallId: id }, { $set: { hallType: type, hallName: name } }).exec();
     }
 
-    public async updateSeat(
-        sessionId: string, seatId: string, isAvailable: boolean
-    ): Promise<void> {
-        await this.sessionWithHallModel.updateOne(
-            { sessionId, "seats.seatId": seatId },
-            { $set: { "seats.$.isAvailable": isAvailable } }
-        ).exec();
-    }   
+    public async updateSeat(sessionId: string, seatId: string, isAvailable: boolean): Promise<void> {
+        await this.sessionWithHallModel
+            .updateOne({ sessionId, "seats.seatId": seatId }, { $set: { "seats.$.isAvailable": isAvailable } })
+            .exec();
+    }
 }
