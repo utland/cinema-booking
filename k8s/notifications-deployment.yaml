@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifications-service
+  namespace: cb
+  labels:
+    app: notifications
+spec:
+  selector:
+    app: notifications
+  ports:
+    - port: 3004
+      targetPort: 3004
+      protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications-deployment
+  namespace: cb
+  labels:
+    app: notifications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifications
+  template:
+    metadata:
+      labels:
+        app: notifications
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: wait-for-rabbitmq
+        image: busybox:1.35
+        command:
+        - 'sh'
+        - '-c'
+        - |
+          until nc -zv rabbitmq-service 5672; do
+            echo "Waiting for RabbitMQ..."
+            sleep 2
+          done
+      containers:
+      - name: notifications
+        image: ghcr.io/utland/cinema-api-notifications:1
+        command: ["node", "dist/apps/notifications/main"]
+        ports:
+        - containerPort: 3004
+          name: http
+        envFrom:
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: notifications-config

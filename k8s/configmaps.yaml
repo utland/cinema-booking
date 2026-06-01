@@ -1,0 +1,60 @@
+---
+# Common Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-config
+data:
+  DATABASE_USER: "postgres"
+  DATABASE_PASSWORD: "password"
+  DATABASE_TYPE: "postgres"
+  DATABASE_PORT: "5432"
+  DATABASE_DB: "cinema-booking"
+  DATABASE_SYNC: "1"
+  DATABASE_HOST: postgres-service
+  
+  RABBITMQ_URL: "amqp://user:password@rabbitmq-service:5672"
+  MONGODB_URL: "mongodb://admin:password123@mongodb-service:27017"
+
+---
+# Booking Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: booking-config
+data:
+  APP_PORT: "3001"
+  STRIPE_SECRET: "sk_test"
+
+---
+# Identity Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: identity-config
+  namespace: cb
+data:
+  APP_PORT: "3002"
+  JWT_SECRET: "jwt_secret"
+  JWT_EXPIRES_IN: "1h"
+
+---
+# Catalog Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-config
+  namespace: cb
+data:
+  APP_PORT: "3003"
+
+---
+# Notifications Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notifications-config
+  namespace: cb
+data:
+  APP_PORT: "3004"
+  NODEMAILER_TOKEN: "nodemailer_token"

@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-service
+  namespace: cb
+  labels:
+    app: identity
+spec:
+  selector:
+    app: identity
+  ports:
+    - port: 3002
+      targetPort: 3002
+      protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-deployment
+  namespace: cb
+  labels:
+    app: identity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity
+  template:
+    metadata:
+      labels:
+        app: identity
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox:1.35
+        command:
+        - 'sh'
+        - '-c'
+        - |
+          until nc -zv postgres-service 5432; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+      - name: wait-for-rabbitmq
+        image: busybox:1.35
+        command:
+        - 'sh'
+        - '-c'
+        - |
+          until nc -zv rabbitmq-service 5672; do
+            echo "Waiting for RabbitMQ..."
+            sleep 2
+          done
+      containers:
+      - name: identity
+        image: ghcr.io/utland/cinema-api-identity:1
+        command: ["node", "dist/apps/identity/main"]
+        ports:
+        - containerPort: 3002
+          name: http
+        envFrom:
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: identity-config

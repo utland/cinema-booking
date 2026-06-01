@@ -1,8 +1,3 @@
-## Project setup
-
-```bash
-$ npm install
-```
 ## Run the app
 
 ```bash
@@ -10,6 +5,12 @@ $ docker compose up -d --build
 ```
 
 ## Compile and run the specific service 
+
+### Project setup
+
+```bash
+$ npm install
+```
 
 ```bash
 # development
